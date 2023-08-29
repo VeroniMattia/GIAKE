@@ -14,10 +14,45 @@ In particular, we let the party identities be registered according to some order
 	Let $\PartySet = (\User[1],\User[2],\dots,\allowbreak \User[n])$ be a list of $n \leq \mu$ parties that want to establish a shared secret key.
 	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is a tuple of four algorithms $\GIAKE = (\KeyGen, \GAKEIni, \GAKERes, \GAKEDer)$ defined as follows:
 	\begin{itemize}
-		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$;
+		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$.
+		Each party $\User[i]$ preventively produces a static key pair $(\ssk_i,\spk_i) \getsr \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI;
 		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{0\leq j \leq n-1})$: a PPT session initialisation algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
 		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
 		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, outputs a session key.
 	\end{itemize}
 	A GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to be assured that nobody but the intended participants may gain access to the shared session key).
 \end{plaindef}
+
+\begin{figure}
+	\centering 
+
+		\begin{tikzpicture}
+	\matrix (m)[matrix of nodes, column  sep=1em,row  sep=1mm,%
+	column 2/.style={minimum width={width(" $(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1,j\neq i}$")},anchor=center},% 
+	column 3/.style={minimum width=6em,anchor=center} ]{
+		%line 1
+	\underline{$\User[i](\ssk_i, \spk_i)$}& & \underline{$\PartySet\setminus\{\User[i]\}$} \\[2mm]
+	%line 2
+		$(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{0\leq j \leq n-1})$ & &\\
+	%line 3
+		& $(\spk_i,m_i)$ & \\
+	%line 4
+		& $(\spk_j,m_j)_{0\leq j \leq n-1,j\neq i}$ & \\
+	%line 5
+		$(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$ & & \\ 
+	%line 6
+		& $(\spk_i,\hat{m}_i)$ & \\
+	%line 7
+		& $(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1,j\neq i}$ & \\
+	%line 8
+		$K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$ & & \\ 
+	};
+	% drawing arrows
+	\draw[-latex] (m-3-2.south west)--(m-3-2.south east);
+	\draw[-latex] (m-4-2.south east)--(m-4-2.south west);
+	\draw[-latex] (m-6-2.south west)--(m-6-2.south east);
+	\draw[-latex] (m-7-2.south east)--(m-7-2.south west);
+	\draw (m-8-1.south west) rectangle (m-1-3.north east);
+	\end{tikzpicture}
+		\caption{A $\GIAKE$ protocol flow from party $\User[i]$'s point of view. All messages (both sent and received ones) are broadcasted to all parties.}\label{fig:giakeprocedure}
+\end{figure}
