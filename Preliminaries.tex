@@ -1,11 +1,23 @@
 \section{Preliminaries}\label{sec:preliminaries}
 Where we put all the cryptographic preliminaries.
 
-\subsection{Group Key Exchange}
-A Group Key Exchange (GKE) protocol allows a set of $\mu > 2$ parties to agree on a shared secret key.
-With \Cref{def:GKE}, we aim for a generic definition that fits different GKE protocols (\mattia{cite a bunch of GKE protocols}).
+\subsection{Group Implicitly Authenticated Key Exchange}
+A Group Key Exchange (GKE) protocol allows a group of parties to agree on a shared secret key. 
+If the key exchange is authenticated, we talk about Group Authenticated Key Exchange (GAKE); if authentication is achieved without the use of an additional cryptographic primitive (e.g. by means of a digital signature algorithm), we say that the protocol is implicitly authenticated (and thus GIAKE).
 
-\begin{plaindef}\label{def:GKE}
-	Let $\lambda\in \N$ be the security parameter. 
-	A \textit{Group Key Exchange} (GKE) protocol is a tuple of four algorithms $\Gake = (\GakeGen, \allowbreak \GakeIni, \GakeRes, \GakeDer)$ 
+We consider the case of an interactive protocol run by a group $\PartySet = (\Party_0,\allowbreak \Party_1,\dots,\Party_{n-1})$ of $n$ parties, with $2 < n \leq \mu$, arranged as a cycle (operations on the indices are taken modulo the group size).
+Each party $\User[i]$ holds a long-term (static) key pair $(\ssk_i,\spk_i)$; we assume the existence of a Public-Key Infrastructure (PKI) that allows users to retrieve the public keys of any other party.
+In particular, we let the party identities be registered according to some ordering (e.g. order of registration to the PKI), allowing for the implicit agreement on the sequence of $n$ parties partaking in the key exchange session.
+
+\begin{plaindef}[GIAKE]\label{def:GKE}
+	Let $\mu \in \NN$ be the maximum number of parties, and let $\secparam\in \NN$ be the security parameter. 
+	Let $\PartySet = (\User[1],\User[2],\dots,\allowbreak \User[n])$ be a list of $n \leq \mu$ parties that want to establish a shared secret key.
+	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is a tuple of four algorithms $\GIAKE = (\KeyGen, \GAKEIni, \GAKERes, \GAKEDer)$ defined as follows:
+	\begin{itemize}
+		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$;
+		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{0\leq j \leq n-1})$: a PPT session initialisation algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
+		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
+		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, outputs a session key.
+	\end{itemize}
+	A GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to be assured that nobody but the intended participants may gain access to the shared session key).
 \end{plaindef}

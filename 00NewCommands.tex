@@ -586,8 +586,8 @@
 \newcommand{\CMQV}{\mathsf{CMQV}}
 %\newcommand{\identity}[1]{\hat{\text{#1}}}%
 \newcommand{\identity}[1]{\textbf{#1}}
-\newcommand{\esk}{esk}
-\newcommand{\lengthesk}{{\lambda}}
+%\newcommand{\esk}{esk}
+%\newcommand{\lengthesk}{{\lambda}}
 \newcommand{\msgIniDHExp}{x}
 \newcommand{\msgIniDH}{X}
 \newcommand{\msgResDHExp}{y}
@@ -1085,6 +1085,10 @@
 	
 	\newcommand{\skS}{\sk}
 	\newcommand{\pkS}{\pk}
+	\newcommand{\ssk}{s}
+	\newcommand{\spk}{S}
+	\newcommand{\esk}{e}
+	\newcommand{\epk}{E}
 	\newcommand{\SIGID}{\SIG[\IDSch]}
 	\newcommand{\pkD}{\pk_b}
 	\newcommand{\pkMinD}{\pk_{1-b}}
@@ -1183,42 +1187,44 @@
 	
 	
 	%GAKE
-	\newcommand{\Gake}{\algfont{GAKE}}
 	\newcommand{\GKE}{\algfont{GKE}}
+	\newcommand{\GAKE}{\algfont{GAKE}}
+	\newcommand{\GIAKE}{\algfont{GIAKE}}
 	\newcommand{\BDGKE}{\GKE_{\mathsf{BD}}}
-	\newcommand{\GAKEsecurityPFSGame}{\GakeFS}
-	\newcommand{\GakeGen}{\algfont{\Gen}_{\Gake}}
-	\newcommand{\GakeIni}{\algfont{Init}}
-	\newcommand{\GakeRes}{\algfont{Res}}
-	\newcommand{\GakeDer}{\algfont{Der}}
+	\newcommand{\GAKEsecurityPFSGame}{\GAKEFS}
+	\newcommand{\GAKEGen}{\algfont{\Gen}_{\GAKE}}
+	\newcommand{\KeyGen}{\algfont{KeyGen}}
+	\newcommand{\GAKEIni}{\algfont{Init}}
+	\newcommand{\GAKERes}{\algfont{Res}}
+	\newcommand{\GAKEDer}{\algfont{Der}}
 	
 	\newcommand{\PartySet}{\setfont{P}}
 	\newcommand{\User}[1][]{\Party_{#1}}
-	\newcommand{\GakePk}[1][]{\pk_{#1}}
-	\newcommand{\GakeSk}[1][]{\sk_{#1}}
+	\newcommand{\GAKEPk}[1][]{\pk_{#1}}
+	\newcommand{\GAKESk}[1][]{\sk_{#1}}
 	
-	\newcommand{\GakeIniMes}{m}
-	\newcommand{\GakeIniResMes}{{\messageIniRes}}
-	\newcommand{\GakeIniMesSet}[1][]{\mathcal{M}_{#1}}
+	\newcommand{\GAKEIniMes}{m}
+	\newcommand{\GAKEIniResMes}{{\messageIniRes}}
+	\newcommand{\GAKEIniMesSet}[1][]{\mathcal{M}_{#1}}
 	\newcommand{\GIniMesSet}{\mathcal{M}}
-	\newcommand{\GakeIniSigSet}{\sigma_{\mathsf{I}}}
-	\newcommand{\GakeResMes}{\hat{m}}
-	\newcommand{\GakeResMesSet}[1][]{\hat{\mathcal{M}}_{#1}}
+	\newcommand{\GAKEIniSigSet}{\sigma_{\mathsf{I}}}
+	\newcommand{\GAKEResMes}{\hat{m}}
+	\newcommand{\GAKEResMesSet}[1][]{\hat{\mathcal{M}}_{#1}}
 	\newcommand{\GResMesSet}{\hat{\mathcal{M}}}
-	\newcommand{\GakeResSigSet}{\pi_{\mathsf{R}}}
-	\newcommand{\GakeState}[1][]{\state_{#1}}
+	\newcommand{\GAKEResSigSet}{\pi_{\mathsf{R}}}
+	\newcommand{\GAKEState}[1][]{\state_{#1}}
 	
 	\newcommand{\GkeState}[1][]{\hat{\state_{#1}}}
-	%\newcommand{\GakeUSet}[1][]{\mathcal{Q}_{#1}}
-	\newcommand{\GakeUSet}{\mathcal{Q}}
-	\newcommand{\GakeUsIDSet}{\mathcal{S}_{\GakeGScnt}}
-	\newcommand{\GakeSessKey}[1][]{\varfont{K}_{#1}}
-	\newcommand{\GakeFS}{\mathsf{IND\hyphen G\hyphen FS}}
-	\newcommand{\GakeIniO}{\orfont{Session}_\mathsf{I}}
-	\newcommand{\GakeResO}{\orfont{Session}_\mathsf{R}}
-	\newcommand{\GakeDerO}{\orfont{Der}}
-	\newcommand{\GakeUId}{i}
-	\newcommand{\GakeGScnt}{k}
+	%\newcommand{\GAKEUSet}[1][]{\mathcal{Q}_{#1}}
+	\newcommand{\GAKEUSet}{\mathcal{Q}}
+	\newcommand{\GAKEUsIDSet}{\mathcal{S}_{\GAKEGScnt}}
+	\newcommand{\GAKESessKey}[1][]{\varfont{K}_{#1}}
+	\newcommand{\GAKEFS}{\mathsf{IND\hyphen G\hyphen FS}}
+	\newcommand{\GAKEIniO}{\orfont{Session}_\mathsf{I}}
+	\newcommand{\GAKEResO}{\orfont{Session}_\mathsf{R}}
+	\newcommand{\GAKEDerO}{\orfont{Der}}
+	\newcommand{\GAKEUId}{i}
+	\newcommand{\GAKEGScnt}{k}
 	\newcommand{\nparty}{\kappa}  % n-party key exchange
 	\newcommand{\responders}{\mathcal{R}}
 	\newcommand{\initiators}{\mathcal{I}}
@@ -1233,26 +1239,26 @@
 	\newcommand{\Gstate}{\state}
 	\newcommand{\Gstates}{\states}
 	
-	\newcommand{\GakeIniGroup}{\notionfont{iniG}}
-	\newcommand{\GakeDerUser}{\notionfont{derU}}
+	\newcommand{\GAKEIniGroup}{\notionfont{iniG}}
+	\newcommand{\GAKEDerUser}{\notionfont{derU}}
 	\newcommand{\sIDIni}{\sID'}
-	\newcommand{\GakeIniUsID}{\sIDIni}
-	\newcommand{\GakeResUsID}{\sID}
-	\newcommand{\GakeTypeIni}{\text{``In''}}
-	\newcommand{\GakeTypeRes}{\text{``Re''}}
+	\newcommand{\GAKEIniUsID}{\sIDIni}
+	\newcommand{\GAKEResUsID}{\sID}
+	\newcommand{\GAKETypeIni}{\text{``In''}}
+	\newcommand{\GAKETypeRes}{\text{``Re''}}
 	\newcommand{\sIDSet}{\notionfont{sIDSet}}
 	\newcommand{\sIDSetIni}{\sIDSet_{I}}
 	\newcommand{\sIDSetRes}{\sIDSet_{R}}
 	\newcommand{\ListsId}{\List{User}}
-	\newcommand{\ListIniID}{\List{\GakeIni}}
-	\newcommand{\ListResID}{\List{\GakeRes}}
+	\newcommand{\ListIniID}{\List{\GAKEIni}}
+	\newcommand{\ListResID}{\List{\GAKERes}}
 	
-	\newcommand{\ListGakeIniMes}{\GIniMes}
+	\newcommand{\ListGAKEIniMes}{\GIniMes}
 	\newcommand{\ListTempIniMes}{\List{I}}
-	\newcommand{\ListGakeResMes}{\GResMes}
+	\newcommand{\ListGAKEResMes}{\GResMes}
 	\newcommand{\ListTempResMes}{\List{R}}
-	\newcommand{\ListGakeStates}{\Gstates}
-	\newcommand{\ListGakeSessKey}{\skeys}
+	\newcommand{\ListGAKEStates}{\Gstates}
+	\newcommand{\ListGAKESessKey}{\skeys}
 	\newcommand{\sIDi}{\sID_{i}}
 	\newcommand{\SchnorrSch}{\mathsf{Schnorr}}
 	
@@ -1263,8 +1269,8 @@
 	\newcommand{\gakebilinpair}{e}
 	%passive security
 	\newcommand{\GOWPV}{\mathsf{OW\hyphen \allowbreak G\hyphen \allowbreak HV}}
-	\newcommand{\GakeExecuteO}{\mathsc{Exe}}
-	\newcommand{\GakeKeyvfyO}{\mathsc{KVer}}
+	\newcommand{\GAKEExecuteO}{\mathsc{Exe}}
+	\newcommand{\GAKEKeyvfyO}{\mathsc{KVer}}
 	\newcommand{\peerssID}{\{\sID_j\}_{j \in [|\peers|]}}
 	
 	\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
