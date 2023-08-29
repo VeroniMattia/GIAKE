@@ -1,0 +1,47 @@
+\documentclass[runningheads,envcountsame]{llncs}
+\input{00UsePackage}
+\input{00NewCommands}
+\usepackage{ulem}
+\setlength\intextsep{10pt}
+%================================
+%=========  MAIN BODY ===========
+%================================
+\begin{document}
+	
+	\title{A smart and catchy title}
+	
+	\titlerunning{Short paper title}
+	
+	
+	
+	\author{Author1\inst{1}
+		and Mattia Veroni\inst{2}}
+	\authorrunning{L. Nürnberger, M. Veroni}
+	
+	\institute{University, \\
+		\email{Email}
+		\and  NTNU - Norwegian University of Science and Technology, Trondheim, NO , \\
+		\email{mattia.veroni@ntnu.no}}
+	
+	\maketitle           
+	
+	\raggedbottom
+	\begin{abstract}
+		Short and captivating advertisement about our incredible work.      
+		
+		\keywords{Keyword 1 \and Keyword 2}
+	\end{abstract}
+	
+	\setlength{\tabcolsep}{3pt}
+	\renewcommand{\arraystretch}{1.15}
+	
+	\input{Introduction}
+	\input{Preliminaries}
+	\input{Protocol}
+	\input{Security}
+	\input{Conclusions}
+	
+	\bibliographystyle{alpha}
+	\bibliography{abbrev0,bibliography}
+	
+\end{document}
