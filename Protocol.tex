@@ -1,2 +1,32 @@
 \section{Protocol}\label{sec:protocol}
-Here is our new protocol.
+Here is our new protocol.\mattia{I still need to finish this. I think we can send the product of $\hat{K}_i^\text{es}$ and $\hat{K}_i^\text{ee}$ instead of sending them separately, so we can compute that term as $\left(\dfrac{S_{i+1}\cdot E_{i+1}}{S_{i-1}\cdot E_{i-1}} \right)^{\esk_i}$ }
+
+\begin{figure}
+	\centering 
+	\fbox{
+	\begin{tikzpicture}[ampersand replacement=\&]
+		\matrix (m)[matrix of nodes, column  sep=1.1em,row  sep=1mm,%
+		nodes={anchor=west}]{
+			%Parties
+			\underline{$\User[1](\ssk_1, \spk_1)$}\& \underline{$\User[2](\ssk_2, \spk_2)$} \&  \underline{$\User[n](\ssk_n, \spk_n)$} \\	
+			% Init
+			\hline$_\GAKEIni$ \\
+			fetch$(\spk_2,\spk_3,\dots,\spk_n)$ \& fetch$(\spk_1,\spk_3,\dots,\spk_n)$ \& fetch$(\spk_1,\spk_2,\dots,\spk_{n-1})$\\
+			$(\esk_1,\epk_1) \getsr \KeyGen(1^\secpar)$ \& $(\esk_2,\epk_2) \getsr \KeyGen(1^\secpar)$ \&  $(\esk_n,\epk_n) \getsr \KeyGen(1^\secpar)$  \\
+
+			broadcast($\epk_1$)\&broadcast($\epk_2$) \& broadcast($\epk_n$) \\
+				\hline$_\GAKERes$\\
+			% Resp
+			%fetch($E_2,E_3,\dots,E_n$) \& fetch($E_1,E_3,\dots,E_n$) \& fetch($E_1,E_2,\dots,E_{n-1}$)\\
+			$\hat{K}_1^\text{se} \gets \left( \dfrac{\epk_2}{\epk_n}\right)^{\ssk_1}$ \& $\hat{K}_2^\text{se} \gets \left( \dfrac{\epk_3}{\epk_1}\right)^{\ssk_2}$   \&   $\hat{K}_n^\text{se} \gets \left( \dfrac{\epk_1}{\epk_{n-1}}\right)^{\ssk_n}$ 	\\
+			$\hat{K}_1^\text{es} \gets \left( \dfrac{\spk_2}{\spk_n}\right)^{\esk_1}$ \& $\hat{K}_2^\text{es} \gets \left( \dfrac{\spk_3}{\spk_1}\right)^{\esk_2}$  \& $\hat{K}_n^\text{es} \gets \left( \dfrac{\spk_1}{\spk_{n-1}}\right)^{\esk_n}$	\\
+			$\hat{K}_1^\text{ee} \gets \left( \dfrac{\epk_2}{\epk_n}\right)^{\esk_1}$ \& $\hat{K}_2^\text{ee} \gets \left( \dfrac{\epk_3}{\epk_1}\right)^{\esk_2}$  \&   $\hat{K}_n^\text{ee} \gets \left( \dfrac{\epk_1}{\epk_{n-1}}\right)^{\esk_n}$ 	\\
+			$\hat{m}_1 \gets (\hat{K}_1^\text{se},\hat{K}_1^\text{es},\hat{K}_1^\text{ee})$ \& $\hat{m}_2 \gets (\hat{K}_2^\text{se},\hat{K}_2^\text{es},\hat{K}_2^\text{ee})$ \&  $\hat{m}_n \gets (\hat{K}_n^\text{se},\hat{K}_n^\text{es},\hat{K}_n^\text{ee})$\\
+			broadcast($\hat{m}_1$) \&broadcast($\hat{m}_2$) \& broadcast($\hat{m}_n$) \\
+				\hline$_\GAKEDer$\\
+			$K_i^{se} \gets $ \& \& \& \\
+		};
+	\end{tikzpicture}
+	}
+	\caption{Our protocol.}\label{fig:ourprotocol}
+\end{figure}
