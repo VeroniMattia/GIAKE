@@ -1,7 +1,7 @@
 \section{Preliminaries}\label{sec:preliminaries}
 Where we put all the cryptographic preliminaries.
 
-\subsection{Group Implicitly Authenticated Key Exchange}
+\subsection{Group Implicitly Authenticated Key Exchange}{subsec:GIAKE}
 A Group Key Exchange (GKE) protocol allows a group of parties to agree on a shared secret key. 
 If the key exchange is authenticated, we talk about Group Authenticated Key Exchange (GAKE); if authentication is achieved without the use of an additional cryptographic primitive (e.g. by means of a digital signature algorithm), we say that the protocol is implicitly authenticated (and thus GIAKE).
 
@@ -20,7 +20,7 @@ In particular, we let the party identities be registered according to some order
 		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
 		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, outputs a session key.
 	\end{itemize}
-	A GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to be assured that nobody but the intended participants may gain access to the shared session key).
+	A GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to rest assured that nobody but the intended participants may gain access to the shared session key).
 \end{plaindef}
 
 \begin{figure}
@@ -56,3 +56,9 @@ In particular, we let the party identities be registered according to some order
 	\end{tikzpicture}
 		\caption{A $\GIAKE$ protocol flow from party $\User[i]$'s point of view. All messages (both sent and received ones) are broadcasted to all parties.}\label{fig:giakeprocedure}
 \end{figure}
+
+\subsection{Security model}\label{subsec:secmodel}
+We now describe the security model in which we will prove our protocol secure.
+The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension to $\mu$ parties of the model described in \cite{JKRS20}.
+Since we aim for implicit authentication for our 2-message protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-message key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{HMQV}.
+In particular, w.r.t. \cite[Section 6.1]{PQR22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an epheremal key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
