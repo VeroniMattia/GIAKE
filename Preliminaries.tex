@@ -5,20 +5,20 @@ Where we put all the cryptographic preliminaries.
 A Group Key Exchange (GKE) protocol allows a group of parties to agree on a shared secret key. 
 If the key exchange is authenticated, we talk about Group Authenticated Key Exchange (GAKE); if authentication is achieved without the use of an additional cryptographic primitive (e.g. by means of a digital signature algorithm), we say that the protocol is implicitly authenticated (and thus GIAKE).
 
-We consider the case of an interactive protocol run by a group $\PartySet = (\Party_0,\allowbreak \Party_1,\dots,\Party_{n-1})$ of $n$ parties, with $2 < n \leq \mu$, arranged as a cycle (operations on the indices are taken modulo the group size).
+We consider the case of an interactive protocol run by a group $\PartySet = (\Party_0,\allowbreak \Party_1,\dots,\Party_{n-1})$ of $n$ parties, with $2 < n \leq \projectKey$, arranged as a cycle (operations on the indices are taken modulo the group size).
 Each party $\User[i]$ holds a long-term (static) key pair $(\ssk_i,\spk_i)$; we assume the existence of a Public-Key Infrastructure (PKI) that allows users to retrieve the public keys of any other party.
 In particular, we let the party identities be registered according to some ordering (e.g. order of registration to the PKI), allowing for the implicit agreement on the sequence of $n$ parties partaking in the key exchange session.
 
 \begin{plaindef}[GIAKE]\label{def:GKE}
-	Let $\mu \in \NN$ be the maximum number of parties, and let $\secparam\in \NN$ be the security parameter. 
-	Let $\PartySet = (\User[1],\User[2],\dots,\allowbreak \User[n])$ be a list of $n \leq \mu$ parties that want to establish a shared secret key.
+	Let $\projectKey \in \NN$ be the maximum number of parties, and let $\secparam\in \NN$ be the security parameter. 
+	Let $\PartySet = (\User[1],\User[2],\dots,\allowbreak \User[n])$ be a list of $n \leq \projectKey$ parties that want to establish a shared secret key.
 	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is a tuple of four algorithms $\GIAKE = (\KeyGen, \GAKEIni, \GAKERes, \GAKEDer)$ defined as follows:
 	\begin{itemize}
 		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$.
 		Each party $\User[i]$ preventively produces a static key pair $(\ssk_i,\spk_i) \getsr \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI;
 		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{0\leq j \leq n-1})$: a PPT session initialisation algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
 		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
-		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, outputs a session key.
+		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, derives a session key.
 	\end{itemize}
 	A GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to rest assured that nobody but the intended participants may gain access to the shared session key).
 \end{plaindef}
@@ -57,8 +57,46 @@ In particular, we let the party identities be registered according to some order
 		\caption{A $\GIAKE$ protocol flow from party $\User[i]$'s point of view. All messages (both sent and received ones) are broadcasted to all parties.}\label{fig:giakeprocedure}
 \end{figure}
 
+\subsection{Hash Proof System}\label{subsec:HPF}
+We now recall the definitions of smooth projective hashing and hash proof system, introduced for the first time in \cite{CS02} and later picked up in \cite{JKRS20}.
+
+Informally, a projective hash function is a keyed hash function associated with two types of keys: the secret \textit{hashing key}, which allows for hashing of every element in the domain, and a public \textit{projective key}, that can be used to hash only those elements that lie in a designated subset (the language) of the domain.
+A projective hash function is \textit{smooth} if the projective key gives only a negligible advantage in correctly hashing an element that lies outside the designated subset.
+
+\begin{definition}[Smooth projective hashing]
+	Let $\Domain,\Codomain$ be two sets, let $\Language \subset \Domain$ be a language and let $\SKSpace,\PKSpace$ be the secret and public key spaces.
+	For any secret key $\sk \in \SKSpace$, let $\Lambda_{\sk} : \Domain \rightarrow \Codomain$ be a keyed hash function.
+	A hash function $\Lambda_{\sk}$ is \textbf{projective} if there exists a projection $\projectKey : \SKSpace \rightarrow \PKSpace$ such that the key $\pk = \projectKey(\sk)$ uniquely defines the action of $\Lambda_\sk$ on $\Language$: For every $\x \in \Language$, the digest $\y = \Lambda_\sk(\x)$ can be consistently computed from $\pk$ and $\x$.
+	
+	A projective hash function is \textbf{smooth} if, given any hashing key $\sk \getsr \SKSpace$ and its projection key $\pk = \projectKey(\sk)$, there exists only a negligible probability to successfully distinguish between samples from the distributions $D_1$ and $D_2$, where
+	\[ D_1 := \{ (\x', \pk, \y) \mid \y = \Lambda_\sk(\x')) \}_{\x' \in \Domain\setminus\Language} \quad \text{and} \quad D_2 := \{(\x', \pk, \y) \mid \y \getsr \Codomain \}_{\x' \in \Domain\setminus\Language}\]
+	Equivalently,\mattia{check this, I give a different definition here} let $\adv$ be an adversary that tries to compute the action of $\HPSHash_\sk$ on $\Domain \setminus \Language$ using the projection key $\pk = \projectKey(\sk)$ of a random $\sk \getsr \SKSpace$; then, for any $\x' \in \Domain \setminus \Language$,
+	\[ \Pr \left[ \y \gets \adv(\pk,\x')  \mid \y = \HPSHash_\sk(\x') \right] \leq \negl[\secpar]\]\mattia{Possibly add the definition of $k$-entropic}
+\end{definition}
+
+Before moving on with the definition of a hash proof system, a few assumptions need to be made.
+First, we assume that the projection function $\projectKey$ and the algorithms for sampling elements from $\Domain$ and from $\Language$ are efficient.
+Secondly, we assume that for every $\x \in \Language$, one can efficiently produce a witness $w$ proving that $\x$ belongs to the language.
+
+\begin{definition}
+	A \textbf{Hash Proof System} (HPS) consists of three algorithms $\HPS = (\HPSParam,\HPSPrivEval,\HPSPubEval)$ defined as follows:
+	\begin{itemize}
+		\item $\HPSparams: = (\HPSgroup,\Codomain,\Domain,\Language,\SKSpace,\PKSpace,\HPSHash,\projectKey)  \getsr \HPSParam (1^\secpar)$: a PPT parameter setup algorithm that outputs a parameter set $\HPSparams$ containing a possibly empty set $\HPSgroup$ of extra parameters, a codomain $\Codomain$, a domain $\Domain$, a language $\Language$, a hashing key space $\SKSpace$, a projective key space $\PKSpace$, a smooth projective hash function $\HPSHash_{(\cdot)}: \Domain \rightarrow \Codomain$ and a projection function $\projectKey: \SKSpace \rightarrow \PKSpace$;
+		\item $\y \gets \HPSPrivEval (\sk,\x)$: a deterministic private hashing algorithm that, on input a secret hashing key $\sk$ and an element $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$;
+		\item $\y \gets \HPSPubEval (\pk,\x,w)$: a deterministic public hashing algorithm that, on input a projection key $\pk = \mu(\sk)$, an element $\x \in \Language$ and a witness $w$ for the fact that $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$.
+	\end{itemize}
+\end{definition}
+
+The fundamental problem which an HPS bases its security on is the $m$- fold subset membership problem, which asks to tell elements sampled from the language apart from elements sampled in its complement.
+\begin{problem}[$m$-fold Subset Membership Problem]
+	Given $m$ elements uniformly drawn from $\Language$ and $m$ elements uniformly drawn from $\Domain \setminus \Language$, an adversary $\adv$ has a negligible advantage in distinguishing them; more formally,
+	\begin{align*} \AdvSMP :=  & \big| \Pr \left[ 1 \gets \adv(\Domain,\Language,\x_1,\dots,\x_m )  \mid \x_1,\dots,\x_m \getsr \Language \right] - \\
+		&\Pr \left[ 1 \gets \adv(\Domain,\Language,\x_1',\dots,\x_m' )  \mid \x_1',\dots,\x_m' \getsr \Domain \setminus \Language \right] \big| \leq \negl[\secpar] 
+		\end{align*}
+\end{problem}
+
 \subsection{Security model}\label{subsec:secmodel}
 We now describe the security model in which we will prove our protocol secure.
-The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension to $\mu$ parties of the model described in \cite{JKRS20}.
+The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension to $\projectKey$ parties of the model described in \cite{JKRS20}.
 Since we aim for implicit authentication for our 2-message protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-message key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{HMQV}.
 In particular, w.r.t. \cite[Section 6.1]{PQR22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an ephemeral key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
