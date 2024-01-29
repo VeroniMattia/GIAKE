@@ -1,14 +1,15 @@
 \section{Preliminaries}\label{sec:preliminaries}
 Where we put all the cryptographic preliminaries.
 
-\subsection{Group Implicitly Authenticated Key Exchange}{subsec:GIAKE}
+\subsection{Group Implicitly Authenticated Key Exchange}\label{subsec:GIAKE}
 \jiaxin{I probably won't use the term "implicitly authenticated" because people are very obsessed with these explicit vs. implicit authentication and have strong opinions on it, but just state authenticated and define weak forward secrecy for it.}
+\mattia{I will specify that we mean entity authentication, and by means of only the key exchange algorithms and no other extra mechanism or assumption}
 A Group Key Exchange (GKE) protocol allows a group of parties to agree on a shared secret key. 
-If the key exchange is authenticated, we talk about Group Authenticated Key Exchange (GAKE); if authentication is achieved without the use of an additional cryptographic primitive (e.g. by means of a digital signature algorithm), we say that the protocol is implicitly authenticated (and thus GIAKE).
+If the key exchange is authenticated, meaning that the entities are somehow authenticated after the protocol run, we talk about Group Authenticated Key Exchange (GAKE); if authentication is achieved without the use of any additional cryptographic primitive (e.g.digital signatures or massage authentication codes), we say that the protocol is implicitly authenticated (and thus GIAKE).
 
-We consider the case of an interactive protocol run by a group $\PartySet = (\Party_0,\allowbreak \Party_1,\dots,\Party_{n-1})$ of $n$ parties, with $2 < n \leq \projectKey$, arranged as a cycle (operations on the indices are taken modulo the group size).
-Each party $\User[i]$ holds a long-term (static) key pair $(\ssk_i,\spk_i)$; we assume the existence of a Public-Key Infrastructure (PKI) that allows users to retrieve the public keys of any other party.
-In particular, we let the party identities be registered according to some ordering (e.g. order of registration to the PKI), allowing for the implicit agreement on the sequence of $n$ parties partaking in the key exchange session.
+We consider the case of an interactive protocol run by a group $\PartySet = (\Party_1,\allowbreak \Party_2,\dots,\Party_n)$ of $n$ parties, with $2 < n \leq \projectKey$, arranged in a cycle (operations on the indices are taken modulo the group size).
+Each party $\User[i]$ holds a long-term (static) key pair $(\ssk_i,\spk_i)$; we assume the existence of a Public-Key Infrastructure (PKI) that allows public-key look-up.
+In particular, we let PKI register the party identities according to some ordering (e.g. time of registration to the PKI), implicitly determining how to sort the participants to key-exchange session in a sequence.
 
 \begin{plaindef}[GIAKE]\label{def:GKE}
 	Let $\projectKey \in \NN$ be the maximum number of parties, and let $\secparam\in \NN$ be the security parameter. 
@@ -17,11 +18,22 @@ In particular, we let the party identities be registered according to some order
 	\begin{itemize}
 		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$.
 		Each party $\User[i]$ preventively produces a static key pair $(\ssk_i,\spk_i) \getsr \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI;
-		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{0\leq j \leq n-1})$: a PPT session initialisation algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
-		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
-		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, derives a session key.
+		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})$: a PPT session initialisation algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
+		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
+		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, derives a session key.
 	\end{itemize}
-	A GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to rest assured that nobody but the intended participants may gain access to the shared session key).
+	
+	We now describe a protocol run, an illustration of which is given in \Cref{fig:giakeprocedure}.
+	In the setup phase, each user $\User[i]$ generates a static key-pair $(\ssk_i,\spk_i) \gets \KeyGen(1^\secpar)$ and registers the public part $\spk_i$ to the PKI.
+	
+	In the first round, each user runs the initialisation algorithm $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})$ on input its static secret key and the intended parties' public keys. 
+	The resulting outputs are an internal state $\st$ and a message $m_i$, which is broadcasted together with the user's index $i$.
+	
+	Upon retrieving the pairs $(j,m_j)$ from the broadcast channel, each user runs the response algorithm $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n})$, updating its internal state and broadcasting the response $\hat{m}_i$.
+	
+	In the last phase, each user derives a shared group session key by running $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n})$.
+	
+	In broad terms, a GIAKE protocol must be \textit{correct} (each honest party can successfully compute the shared session key) and \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to rest assured that nobody but the intended participants may gain access to the shared session key).
 \end{plaindef}
 
 \begin{figure}
@@ -57,6 +69,16 @@ In particular, we let the party identities be registered according to some order
 	\end{tikzpicture}
 		\caption{A $\GIAKE$ protocol flow from party $\User[i]$'s point of view. All messages (both sent and received ones) are broadcasted to all parties.}\label{fig:giakeprocedure}
 \end{figure}
+
+\subsection{Security model for GIAKE}\label{subsec:secmodel}
+We now describe a security model for a two-round broadcast group authenticated key exchange, that allows a set of $n > 2$ parties to establish a common secret key.
+The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension to $\projectKey$ parties of the model described in \cite{JKRS20}.
+Since we aim for implicit authentication for our 2-message protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-message key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{HMQV}.
+In particular, w.r.t. \cite[Section 6.1]{PQR22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an ephemeral key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
+
+\paragraph{Execution environment}
+
+
 
 \subsection{Hash Proof System}\label{subsec:HPF}
 We now recall the definitions of smooth projective hashing and hash proof system, introduced for the first time in \cite{CS02} and later picked up in \cite{JKRS20}.
@@ -96,8 +118,4 @@ The fundamental problem which an HPS bases its security on is the $m$- fold subs
 		\end{align*}
 \end{problem}
 
-\subsection{Security model}\label{subsec:secmodel}
-We now describe the security model in which we will prove our protocol secure.
-The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension to $\projectKey$ parties of the model described in \cite{JKRS20}.
-Since we aim for implicit authentication for our 2-message protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-message key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{HMQV}.
-In particular, w.r.t. \cite[Section 6.1]{PQR22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an ephemeral key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
+
