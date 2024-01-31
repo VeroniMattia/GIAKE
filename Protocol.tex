@@ -1,5 +1,5 @@
 \section{Protocol}\label{sec:protocol}
-In this section we present our first protocol \mattia{name of the protocol}, presented from the viewpoint of user $\User[i]$.
+In this section we present our first protocol \mattia{name of the protocol}, presented from the viewpoint of party $\User[i]$.
 We then show its correctness, expanding the computation that $\User[i]$ performs in the key-derivation phase.
 We prove the protocol secure \mattia{security notion and model} in \Cref{sec:security}.
 
@@ -66,9 +66,9 @@ We prove the protocol secure \mattia{security notion and model} in \Cref{sec:sec
 	\caption{The protocol view of $\User[i]$.}\label{fig:ourprotocol}
 \end{figure}
 
-In the Setup phase, each user $\User[i]$ generates a static key pair $(\ssk_i,\spk_i)$, and registers its public key $\spk_i$ using a PKI.
-In the Initialization phase, each user $\User[i]$ retrieves from the PKI the static keys $(\spk_1,\dots,\spk_n)$ of all the participants $\User[1],\dots,\User[n]$  in the key-exchange; then, it generates an ephemeral key pair $(\esk_i,\epk_i)$, and broadcasts the public key $\epk_i$. 
-In the Response phase, the user mixes static and ephemeral key material as follows:
+In the Setup phase, each party $\User[i]$ generates a static key pair $(\ssk_i,\spk_i)$, and registers its public key $\spk_i$ using a PKI.
+In the Initialization phase, each party $\User[i]$ retrieves from the PKI the static keys $(\spk_1,\dots,\spk_n)$ of all the participants $\User[1],\dots,\User[n]$  in the key-exchange; then, it generates an ephemeral key pair $(\esk_i,\epk_i)$, and broadcasts the public key $\epk_i$. 
+In the Response phase, the party mixes static and ephemeral key material as follows:
 \begin{itemize}
 	\item it computes the static-on-ephemeral element $\hat{K}_i^\text{(se)} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\ssk_i}$
 	\item it computes the ephemeral-on-static element $\hat{K}_n^\text{(es)} \gets \left( \dfrac{\spk_{i+1}}{\spk_{i-1}}\right)^{\esk_i}$
