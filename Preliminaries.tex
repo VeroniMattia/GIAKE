@@ -87,7 +87,9 @@ Depicted in \Cref{fig:game-ind-atk-gake}, {\textbf{GAME} $\GIAKEsecurityPFSGame$
 The challenger generates keys for all parties in $\Universe$, tosses a coin $b$ and gives the adversary $\adv$ access to the public keys of all parties.
 The adversary has then to guess the bit $b$, based on the following additional oracle calls:
 \begin{itemize}
-	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to initiate a group key exchange session with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the initialisation algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round.
+	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to initiate a group key exchange session with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the initialisation algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
+	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to proceed with the response phase in session $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in response to its initialisation message. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round
+	\item with $\GakeDerO(\GakeResUsID \in [\cntS],  \GakeResMesSet[{i}])$, the adversary triggers $\owner[\sID]$ to proceed with the key derivation in session $\sID$, using $\GakeResMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted after its response message $\GakeResMes_{i}$. We let $\Gstates[\sID]$ denote the (secret) state information, i.e. ephemeral secret keys, $\ListGakeSessKey[\sID]$ denote the session key, and $\emptystr$ denote an empty string.
 \end{itemize}
 
 
@@ -122,15 +124,15 @@ The adversary has then to guess the bit $b$, based on the following additional o
 					\item $\pcreturn (\sID, \GakeIniMes_{i})$\\
 				\end{nicodemus}
 
-				\underline{$\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$} %\gcom{$\GakeIniMesSet[{i}]$ is a set of messages}
+				\underline{$\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$} 
 				\begin{nicodemus}
-					\item $(\GIni,\PartySet{i}) := (\owner[\sID],\peer[\sID])$
-					\item \pcif $|\GakeIniMesSet[{i}]| \neq |\PartySet{i}|$ 
+					\item $(\GIni,\PartySet_{i}) := (\owner[\sID],\peer[\sID])$
+					\item \pcif $|\GakeIniMesSet[{i}]| \neq |\PartySet_{i}|$ 
 					\item \quad  \pcreturn $\bot$ 
 					\gcom{all peers must have broadcasted}
-					\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet{i}} \corrupted[j]$
+					\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet_{i}} \corrupted[j]$
 					\item $\GIniMesSet[\sID] \coloneqq  \GakeIniMesSet[{i}]$ \label{line:gake-problem-a}
-					\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[\GIni], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
+					\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[i], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
 					\item $\GResMes[\sID]:=({i},\GakeResMes_{i})$
 					\item $\Gstates[\sID]:= \Gstate$
 					\item \pcreturn $\GakeResMes_{i}$ 
@@ -184,12 +186,6 @@ The adversary has then to guess the bit $b$, based on the following additional o
 \paragraph{Execution environment.} We consider $\mu$ parties $\User[1], \ldots, \User[\mu]$, with static key pairs $(\spk_i, \ssk_i), i \in [\mu]$. 
 For each key exchange, each party in a group $\PartySet$ has its own session with a unique identification number $\sID$, and variables which are defined relative to $\sID$:
 
-\begin{itemize}
-	\item $\GResMes[\sID]$ denotes the message sent by the owner during the second round.
-	\item $\GResMesSet[\sID]$ denotes the messages received by the owner during the second round.
-	\item $\Gstates[\sID]$ denotes the (secret) state information, i.e. ephemeral secret keys.
-	\item $\ListGakeSessKey[\sID]$ denotes the session key.
-\end{itemize}
 
 %\paragraph{Adversary model.} Similar to the $\AKE$ security notion, we do not allow the adversary to register adversarially controlled parties by providing long-term public keys, and the adversary has access to oracles $\CorruptO$ and $\RevealO$ as described in ~\cref{fig:game-ind-atk-gake}. We use the following boolean values to store which queries the adversary made:
 %
