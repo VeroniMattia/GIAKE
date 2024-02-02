@@ -128,8 +128,7 @@ The adversary has then to guess the bit $b$, based on the following additional o
 				\begin{nicodemus}
 					\item $(\GIni,\PartySet_{i}) := (\owner[\sID],\peer[\sID])$
 					\item \pcif $|\GakeIniMesSet[{i}]| \neq |\PartySet_{i}|$ 
-					\item \quad  \pcreturn $\bot$ 
-					\gcom{all peers must have broadcasted}
+					\item \quad  \pcreturn $\bot$ \gcom{all peers must have broadcasted}
 					\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet_{i}} \corrupted[j]$
 					\item $\GIniMesSet[\sID] \coloneqq  \GakeIniMesSet[{i}]$ \label{line:gake-problem-a}
 					\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[i], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
