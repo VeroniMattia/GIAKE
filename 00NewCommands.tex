@@ -7,7 +7,7 @@
 %fonts
 \newcommand{\setfont}[1]{\mathcal{#1}}
 \newcommand{\algfont}[1]{{\mathsf{#1}}}
-
+\newcommand{\mathsc}{\textsc}
 %code
 \newcommand{\getsr}{\gets_{\scriptscriptstyle\$}} %dollar behind arrow
 \renewcommand{\getsr}{\mathrel{\vbox{\offinterlineskip\ialign{
@@ -15,19 +15,35 @@
 				\hspace{0.1em}$\scriptscriptstyle\$$\cr
 				$\leftarrow$\cr
 }}}} %dollar on arrow
-
+\def\makeuppercase#1{
+	\expandafter\newcommand\csname cal#1\endcsname{\mathcal{#1}}
+	\expandafter\newcommand\csname adv#1\endcsname{\mathcal{#1}}
+	\expandafter\newcommand\csname frak#1\endcsname{\mathfrak{#1}}
+	\expandafter\newcommand\csname bb#1\endcsname{\mathbb{#1}}
+	\expandafter\newcommand\csname bf#1\endcsname{\textbf{#1}}
+}
+\newcounter{char}
+\setcounter{char}{1}
+\loop
+\edef\Letter{\Alph{char}}
+\expandafter\makeuppercase\Letter
+\stepcounter{char}
+\unless\ifnum\thechar>26
+\repeat
 %spaces
 \newcommand{\Domain}{\mathcal{D}}
 \newcommand{\Codomain}{\mathcal{C}}
 \newcommand{\Language}{\mathcal{L}}
 \newcommand{\PKSpace}{\mathcal{PK}}
 \newcommand{\SKSpace}{\mathcal{SK}}
-
+\newcommand{\changehighlight}[1]{#1}
 
 %roles
 \newcommand{\Party}{\mathsf{P}}
 \newcommand{\PartySet}{\setfont{P}}
 \newcommand{\User}[1][]{\Party_{#1}}
+\newcommand{\GakePk}[1][]{\pk_{#1}}
+\newcommand{\GakeSk}[1][]{\sk_{#1}}
 
 %keys
 \newcommand{\skS}{\sk}
@@ -46,6 +62,9 @@
 \newcommand{\GAKEDer}{\algfont{Der}}
 \newcommand{\messageIni}{m_{\ini}}
 \newcommand{\messageIniRes}{m_{j}}
+\newcommand{\GiakeFS}{\mathsf{IND\hyphen G\hyphen FS}}
+\newcommand{\GIAKEsecurityPFSGame}{\GiakeFS}
+\newcommand{\hyphen}{\mbox{-}}
 
 %HPS
 \newcommand{\HPS}{\algfont{HPS}}
@@ -65,3 +84,99 @@
 %games
 \newcommand{\Adv}{\mathrm{Adv}}
 \newcommand{\AdvSMP}{\Adv_\HPS^{m-\mathrm{SMP}}}
+\newcommand{\sid}{\text{sID}}
+\newcommand{\sID}{\text{sID}}
+\newcommand{\testSessions}{\mathcal{S}}
+\newcommand{\bool}[1]{\llbracket #1\rrbracket}
+\newcommand{\orfont}[1]{\mathsc{#1}}      % Oracle font
+\newcommand{\GakeIni}{\algfont{Init}}
+\newcommand{\GakeIniO}{\orfont{Session}_\mathsf{I}}
+\newcommand{\GIni}{i}
+\newcommand{\GakeUId}{i}
+\newcommand{\cntS}{\text{cnt}_{\text{S}}}
+\newcommand{\incr}{\texttt{++}}
+\newcommand{\owner}{\text{owner}}
+\newcommand{\peer}{\text{peer}}
+\newcommand{\GakeUSet}{\mathcal{Q}}
+\newcommand{\GakeIniMes}{m}
+\renewcommand{\state}{\text{st}}
+\newcommand{\Gstate}{\state}
+
+
+%Oracles
+\newcommand{\DecO}{\mathsc{Dec}}
+\newcommand{\EncO}{\mathsc{Enc}}
+\newcommand{\CorruptO}{\mathsc{Corr}}
+\newcommand{\SignO}{\mathsc{Sign}}
+\newcommand{\HashAO}{\hat{\mathsc{H}}}
+\newcommand{\HashBO}{\mathsc{Hash}_2}
+\newcommand{\ChallengeO}{\mathsc{Chall}}
+\newcommand{\EncapsO}{\mathsc{Encaps}}
+\newcommand{\DecapsO}{\mathsc{Decaps}}
+\newcommand{\ContinueSessionLO}{\mathsc{Der_{\mathsc{I}}}}
+\newcommand{\ContinueSessionRO}{\mathsc{Der_{\mathsf{R}}}}
+\newcommand{\RevealO}{\mathsc{Reveal}}
+\newcommand{\RevstateO}{\mathsc{Rev\text{-}State}}
+\newcommand{\TestO}{\mathsc{Test}}
+\newcommand{\ValidAttackO}{\mathsc{Valid}}
+\newcommand{\FreshnessO}{\mathsc{Fresh}}
+\newcommand{\ExecuteO}{\mathsc{Exe}}
+\newcommand{\KeyvfyO}{\mathsc{KVer}}
+
+
+\newcommand{\GakeRes}{\algfont{Res}}
+\newcommand{\GakeIniResMes}{{\messageIniRes}}
+\newcommand{\GakeIniMesSet}[1][]{\mathcal{M}_{#1}}
+\newcommand{\GIniMesSet}{\mathcal{M}}
+\newcommand{\GakeIniSigSet}{\sigma_{\mathsf{I}}}
+\newcommand{\GakeResMes}{\hat{m}}
+\newcommand{\GakeResMesSet}[1][]{\hat{\mathcal{M}}_{#1}}
+\newcommand{\GResMesSet}{\hat{\mathcal{M}}}
+\newcommand{\GakeResSigSet}{\pi_{\mathsf{R}}}
+\newcommand{\GakeState}[1][]{\state_{#1}}
+
+\newcommand{\GkeState}[1][]{\hat{\state_{#1}}}
+\newcommand{\GakeUsIDSet}{\mathcal{S}_{\GakeGScnt}}
+\newcommand{\GakeSessKey}[1][]{\varfont{K}_{#1}}
+\newcommand{\GakeFS}{\mathsf{IND\hyphen G\hyphen FS}}
+\newcommand{\GakeResO}{\orfont{Session}_\mathsf{R}}
+\newcommand{\GakeDer}{\algfont{Der}}
+\newcommand{\GakeDerO}{\orfont{Der}}
+\newcommand{\GakeGScnt}{k}
+\newcommand{\nparty}{\kappa}  % n-party key exchange
+\newcommand{\responders}{\mathcal{R}}
+\newcommand{\initiators}{\mathcal{I}}
+%\newcommand{\parties}{\text{users}}
+\newcommand{\peers}{\mathcal{P}}
+\newcommand{\numpeers}{n}
+\newcommand{\GIniMes}{\changehighlight{\mathsf{Msg_I}}}
+\newcommand{\GResMes}{\changehighlight{\mathsf{Msg_R}}}
+\newcommand{\states}{\text{state}}
+\newcommand{\Gstates}{\states}
+
+\newcommand{\GakeIniGroup}{\notionfont{iniG}}
+\newcommand{\GakeDerUser}{\notionfont{derU}}
+\newcommand{\sIDIni}{\sID'}
+\newcommand{\GakeIniUsID}{\sIDIni}
+\newcommand{\GakeResUsID}{\sID}
+\newcommand{\GakeTypeIni}{\text{``In''}}
+\newcommand{\GakeTypeRes}{\text{``Re''}}
+\newcommand{\sIDSet}{\notionfont{sIDSet}}
+\newcommand{\sIDSetIni}{\sIDSet_{I}}
+\newcommand{\sIDSetRes}{\sIDSet_{R}}
+\newcommand{\ListsId}{\List{User}}
+\newcommand{\ListIniID}{\List{\GakeIni}}
+\newcommand{\ListResID}{\List{\GakeRes}}
+\newcommand{\corrupted}{\text{corrupted}}
+\newcommand{\peercorrupted}{\text{peerCorrupted}}
+
+\newcommand{\ListGakeIniMes}{\GIniMes}
+\newcommand{\ListTempIniMes}{\List{I}}
+\newcommand{\ListGakeResMes}{\GResMes}
+\newcommand{\ListTempResMes}{\List{R}}
+\newcommand{\ListGakeStates}{\Gstates}
+\newcommand{\skeys}{\text{sKey}}
+\newcommand{\ListGakeSessKey}{\skeys}
+\newcommand{\sIDi}{\sID_{i}}
+\newcommand{\SchnorrSch}{\mathsf{Schnorr}}
+\newcommand{\gcom}[1]{\hfill $\sslash$#1}
