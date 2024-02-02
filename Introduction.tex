@@ -3,15 +3,30 @@
 
 
 \section{Introduction}\label{sec:introduction}
-A group authenticated key exchange (\introGAKE) protocol allows a group of users to agree on a shared session key in the present of an active adversary. It extends the \introAKE protocol from 2-party to $n$-party setting. Similar to the security requirements of 
+A group authenticated key exchange (\introGAKE) protocol allows a group of users to agree on a shared session key. It extends the \introAKE protocol from 2-party to $n$-party setting. Similar to the security requirements of \introAKE protocols, we allow adversaries to have full control of the communication, and they can also reveal some of the shared session keys and corrupt long-term secret key of some honest users. 
+In the end, we require that the shared session key from a \introGAKE should be pseudo-random.
+
+\paragraph{Existing Constructions.}
+Constructing secure \introGAKE protocols has a long history, and almost all the existing protocols \cite{} are constructed via a signature-based approach. Namely, it uses a digital signature scheme to authenticate a passively secure group key protocol.
+
+% They all have single-Test query
+
+\paragraph{Tight Security.}
+
+\paragraph{``Sweet-spot'' between Efficiency and Tightness.}
+We are interested in tightness, but more into searching the sweet-spot between tightness and efficiency.
 
 \subsection{Our Contribution.}
 How magnificent have we been?
 
 Our efficiency $\approx$ $3\times $ BD, but much less than the Sign-GAKE (2*Sign + 3*Ver) per user.
 
-\subsection{Related Work.}
-There will be a lot to write about here, at least comparing efficiency.
+\paragraph{Open Problems.}
+We leave constructing an efficient signature-less post-quantum \introGAKE protocol as an interesting open problem. 
+Standard model construction?
+
+%\subsection{Related Work.}
+%There will be a lot to write about here, at least comparing efficiency.
 
 \subsection{Roadmap.}
 Going through the paper highlighting section by section.
