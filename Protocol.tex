@@ -43,11 +43,11 @@ We prove the protocol secure \mattia{security notion and model} in \Cref{sec:sec
 				%Parties
 				 \underline{$\User[i](\ssk_i, \spk_i)$}  \\	
 				% Init
-				\hline$_\GAKEIni$ \\
+				\hline$\GAKEIni$ \\
 				fetch$(\spk_1,\spk_2,\dots,\spk_{i-1},\spk_{i+1},\dots,\spk_{n})$\\
 				$(\esk_i,\epk_i) \getsr \KeyGen(1^\secpar)$  \\
 				broadcast($\epk_i$) \\
-				\hline$_\GAKERes$\\
+				\hline$\GAKERes$\\
 				% Resp
 				%fetch($E_2,E_3,\dots,E_n$) \& fetch($E_1,E_3,\dots,E_n$) \& fetch($E_1,E_2,\dots,E_{n-1}$)\\
 				$\hat{K}_i^\text{(se)} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\ssk_i}$ 	\\
@@ -55,7 +55,7 @@ We prove the protocol secure \mattia{security notion and model} in \Cref{sec:sec
 				$\hat{K}_n^\text{ee} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\esk_i}$ 	\\
 				$\hat{m}_i \gets (\hat{K}_i^\text{(se)},\hat{K}_i^\text{(es)},\hat{K}_i^\text{ee})$ \\
 				broadcast($\hat{m}_i$) \\
-				\hline$_\GAKEDer$\\
+				\hline$\GAKEDer$\\
 				$K_i^{(se)} \gets E_{i-1}^{ns_i} \cdot (\hat{K}_i^\text{(se)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(se)})^{n-2} \cdots \hat{K}_{i-2}^\text{(se)}$  \\
 				$K_i^{(es)} \gets S_{i-1}^{n\esk_i} \cdot (\hat{K}_i^\text{(es)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(es)})^{n-2} \cdots \hat{K}_{i-2}^\text{(es)}$  \\
 				$K_i^{(ee)} \gets E_{i-1}^{n\esk_i} \cdot (\hat{K}_i^\text{(ee)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(ee)})^{n-2} \cdots \hat{K}_{i-2}^\text{(ee)}$  \\
