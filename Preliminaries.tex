@@ -13,14 +13,14 @@ A local \textit{instance} is what a participant computes, influenced by the rece
 The local instance is run in a \textit{context}, which consists of all the information that does not come directly from algorithmic outputs or received messages, e.g. set of participants, number of sessions, etc.
 We call a participant in a GKE session a \textit{party}.
 
-\paragraph{The generic protocol.} We consider the case of an interactive protocol, run by a group $\PartySet = (\Party_1,\allowbreak \Party_2,\dots,\Party_n)$ of $n$ parties, with $2 < n \leq \projectKey$, arranged in a cycle (operations on the indices are taken modulo the group size).
-Each party $\User[i]$ holds a static (long-term) key pair $(\ssk_i,\spk_i)$; we assume the existence of a Public-Key Infrastructure (PKI) that allows for public-key look-up.
+\paragraph{The generic protocol.} We consider a universe $\Universe$ of size $\mu$, containing all users in the system.
+Each user holds a static (long-term) key pair $(\ssk_i,\spk_i)$, and is registered in the system by its public key $\spk$; we treat the universe as a Public-Key Infrastructure (PKI) that allows for public-key look-up.
 In particular, we let PKI register the party identities according to some ordering (e.g. time of registration to the PKI), implicitly determining how to sort the participants to a key-exchange session in a sequence.
 
 \begin{plaindef}[GIAKE]\label{def:GKE}
 	Let $\projectKey \in \NN$ be the maximum number of parties, and let $\secparam\in \NN$ be the security parameter. 
-	Let $\PartySet = (\User[1],\User[2],\dots,\allowbreak \User[n])$ be a list of $n \leq \projectKey$ parties that want to establish a shared secret key.
-	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is a tuple of four algorithms $\GIAKE = (\KeyGen, \GAKEIni, \GAKERes, \GAKEDer)$ defined as follows:
+	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is run by $3\leq n \leq \mu$ parties in $\PartySet = (\Party_1,\allowbreak \Party_2,\dots,\Party_n)$, arranged in a cycle (operations on the indices are taken modulo $n$).
+	The protocol consists of four algorithms $\GIAKE = (\KeyGen, \GAKEIni, \GAKERes, \GAKEDer)$ defined as follows:
 	\begin{itemize}
 		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$.
 		Each party $\User[i]$ preventively produces a static key pair $(\ssk_i,\spk_i) \getsr \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI;
@@ -28,7 +28,7 @@ In particular, we let PKI register the party identities according to some orderi
 		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
 		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, derives a session key.
 	\end{itemize}
-	The scheme must implicitly guarantee authentication, i.e. without the use of other primitives.
+	After a honest run, the protocol must implicitly guarantee authentication, i.e. without the use of other primitives.
 \end{plaindef}	
 
 \begin{figure}
@@ -43,15 +43,15 @@ In particular, we let PKI register the party identities according to some orderi
 			%line 2
 			$(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{0\leq j \leq n-1})$ & &\\
 			%line 3
-			& $(\spk_i,m_i)$ & \\
+			& $(i,m_i)$ & \\
 			%line 4
-			& $(\spk_j,m_j)_{0\leq j \leq n-1,j\neq i}$ & \\
+			& $(j,m_j)_{0\leq j \leq n-1,j\neq i}$ & \\
 			%line 5
 			$(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{0\leq j \leq n-1})$ & & \\ 
 			%line 6
-			& $(\spk_i,\hat{m}_i)$ & \\
+			& $(i,\hat{m}_i)$ & \\
 			%line 7
-			& $(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1,j\neq i}$ & \\
+			& $(j,m_j,\hat{m}_j)_{0\leq j \leq n-1,j\neq i}$ & \\
 			%line 8
 			$K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{0\leq j \leq n-1})$ & & \\ 
 		};
@@ -66,22 +66,32 @@ In particular, we let PKI register the party identities according to some orderi
 \end{figure}
 
 	We now describe a protocol run as viewed by party $\User[i]$, an illustration of which is given in \Cref{fig:giakeprocedure}.
-	In the setup phase, each party $\User[i]$ generates a static key-pair $(\ssk_i,\spk_i) \gets \KeyGen(1^\secpar)$ and registers the public part $\spk_i$ to the PKI.
+	In the setup phase, each party $\User[i]$ generates a static key-pair $(\ssk_i,\spk_i) \gets \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI.
 	In the first round, each party runs the initialisation algorithm \[(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})\] on input its static secret key and the intended parties' public keys. 
-	The resulting outputs are an internal state $\st$ and a message $m_i$, the latter of which is broadcasted together with $\spk_i$.
-	Upon retrieving $\{(\spk_j,m_j)\}_{1\leq j \leq n, j \neq i}$ from the broadcast channel, each party runs the response algorithm \[(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n})\], updating its internal state and broadcasting $(\spk_i,\hat{m}_i)$.
-	In the last phase, each party derives the group key for the session by running \[K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n})\].
+	The resulting outputs are an internal state $\st$ and a message $m_i$, the latter of which is broadcasted together with $i$.
+	Upon retrieving $\{(j,m_j)\}_{1\leq j \leq n, j \neq i}$ from the broadcast channel, each party runs the response algorithm \[(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n}),\] updating its internal state and broadcasting $(i,\hat{m}_i)$.
+	In the last phase, each party derives the group key for the session by running \[K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n}).\]
 	
 	In broad terms, a GIAKE protocol must be \textit{correct} (each honest party can successfully compute the group key at the end of an honest session), \textit{implicitly authenticated} (the four algorithms in $\GIAKE$ are sufficient for each party to rest assured that nobody but the intended participants may gain access to the session key) and secure (the meaning of which varies; see \Cref{subsec:secmodel}).
 
 \subsection{Security model for GIAKE}\label{subsec:secmodel}
 We now describe a security model for a two-round broadcast group authenticated key exchange, that allows a set of $n > 2$ parties to establish a common secret key.
-The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension to $\projectKey$ parties of the model described in \cite{JKRS20}.
+The adversarial model is borrowed from \cite[Section 6.1]{PQR22}, which is in itself an extension of the model described in \cite{JKRS20}.
 Since we aim for implicit authentication for our 2-round protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-round key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{HMQV}.
 In particular, w.r.t. \cite[Section 6.1]{PQR22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an ephemeral key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
 
 In this security model, no mechanism to provide explicit message authentication is considered.
 Instead, implicit authentication implies that only the intended honest parties can successfully compute the group key for the session.
+
+Depicted in \Cref{fig:game-ind-atk-gake}, {\textbf{GAME} $\GIAKEsecurityPFSGame$} denotes the security game for the group key exchange. 
+The challenger generates keys for all parties in $\Universe$, tosses a coin $b$ and gives the adversary $\adv$ access to the public keys of all parties.
+The adversary has then to guess the bit $b$, based on the following additional oracle calls:
+\begin{itemize}
+	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to initiate a group key exchange session with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the initialisation algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
+	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to proceed with the response phase in session $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in response to its initialisation message. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round
+	\item with $\GakeDerO(\GakeResUsID \in [\cntS],  \GakeResMesSet[{i}])$, the adversary triggers $\owner[\sID]$ to proceed with the key derivation in session $\sID$, using $\GakeResMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted after its response message $\GakeResMes_{i}$. We let $\Gstates[\sID]$ denote the (secret) state information, i.e. ephemeral secret keys, $\ListGakeSessKey[\sID]$ denote the session key, and $\emptystr$ denote an empty string.
+\end{itemize}
+
 
 \begin{figure}[h!]
 	\centering
@@ -90,10 +100,10 @@ Instead, implicit authentication implies that only the intended honest parties c
 			\begin{minipage}[t]{7.5cm}
 				\underline{\textbf{GAME} $\GIAKEsecurityPFSGame$} 
 				\begin{nicodemus}[1]
-					\item $\pcfor n \in [\mu]$
-					\item \quad $(\pk_n, \sk_n) \leftarrow \KeyGen(\secparam)$
+					\item $\pcfor i \in [\mu]$
+					\item \quad $(\spk_i, \ssk_i) \leftarrow \KeyGen(\secparam)$
 					\item $b\getsr \{0,1\}$
-					\item $b' \gets	\Adv^{O}(\pk_1, \cdots, \pk_\mu)$
+					\item $b' \gets	\Adv^{O}(\spk_1, \cdots, \spk_\mu)$
 					\item \pcfor $\sID^*\in\testSessions$:
 					\item \quad \pcif $\FreshnessO(\sID^*)=\pcfalse$
 					\item \quad \quad $\pcreturn 0$\gcom{session not fresh}\label{line:gakefreshness}
@@ -101,28 +111,28 @@ Instead, implicit authentication implies that only the intended honest parties c
 					\item \quad \quad  $\pcreturn 0$\gcom{no valid attack}
 					\item $\pcreturn \bool{b=b'}$ \\
 				\end{nicodemus}
-				\underline{$\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$}
+				\underline{$\GakeIniO ( \GIni  \in \Universe, \PartySet_{i} \subseteq \Universe)$}
 				\begin{nicodemus}
 					\item $\cntS~\incr$
 					\item $\sID \coloneqq \cntS$
 					\item $\owner[\sID]:=\GIni $ 
-					\item $\peer[\sID]:=\PartySet{i} $
-					\item $\GakeUSet[\sID] \coloneqq \peer[\sID] \cup \{\GIni\}$
-					\item $(\GakeIniMes_{i}, \Gstate) \getsr \GakeIni(\GakeSk[{i}], \{\GakePk[j]\}_{j \in \PartySet{i}})$
+					\item $\peer[\sID]:=\PartySet_{i} $
+					\item $\GakeUSet[\sID] \coloneqq \PartySet_{i} \cup \{\GIni\}$
+					\item $(\GakeIniMes_{i}, \Gstate) \getsr \GakeIni(\GakeSk[{i}], \{\GakePk[j]\}_{j \in \PartySet_{i}})$
 					\item $\GIniMes[\sID]:= ({i},\GakeIniMes_{i}) $
 					\item $\Gstates[\sID]:=\Gstate$
 					\item $\pcreturn (\sID, \GakeIniMes_{i})$\\
 				\end{nicodemus}
 
-				\underline{$\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$} %\gcom{$\GakeIniMesSet[{i}]$ is a set of messages}
+				\underline{$\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$} 
 				\begin{nicodemus}
-					\item $(\GIni,\PartySet{i}) := (\owner[\sID],\peer[\sID])$
-					\item \pcif $|\GakeIniMesSet[{i}]| \neq |\PartySet{i}|$ 
+					\item $(\GIni,\PartySet_{i}) := (\owner[\sID],\peer[\sID])$
+					\item \pcif $|\GakeIniMesSet[{i}]| \neq |\PartySet_{i}|$ 
 					\item \quad  \pcreturn $\bot$ 
 					\gcom{all peers must have broadcasted}
-					\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet{i}} \corrupted[j]$
+					\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet_{i}} \corrupted[j]$
 					\item $\GIniMesSet[\sID] \coloneqq  \GakeIniMesSet[{i}]$ \label{line:gake-problem-a}
-					\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[\GIni], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
+					\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[i], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
 					\item $\GResMes[\sID]:=({i},\GakeResMes_{i})$
 					\item $\Gstates[\sID]:= \Gstate$
 					\item \pcreturn $\GakeResMes_{i}$ 
@@ -173,22 +183,11 @@ Instead, implicit authentication implies that only the intended honest parties c
 \end{figure}
 
 
-%\heading{Execution environment.} We consider $\mu$ parties $\PartySet = (\User[1], \ldots, \User[\mu])$ with long-term key pairs $(\pk_i, \sk_i), i \in [\mu]$. For each group key exchange, each party in a group $\GakeUSet$ has their own session with a unique identification number $\sID$, and variables which are defined relative to $\sID$:
-%
-%\begin{itemize}
-%	\item $\owner[\sID] \in [\mu]$ denotes the owner of the session.
-%	\item $\peer[\sID] \subseteq[\mu]$ denotes the peers of the session.
-%	\item $\GakeUSet[\sID]$ denotes all the participants of the session.
-%	%	\item $\GakeUSet[\sID]$ denotes all the group members. %(i.e. $\peer[\sID]\cup \{\owner[\sID]\}$).
-%	\item $\GIniMes[\sID]$ denotes the message sent by the owner during the first round.
-%	\item $\GIniMesSet[\sID]$ denotes the messages received by the owner during the first round.
-%	\item $\GResMes[\sID]$ denotes the message sent by the owner during the second round.
-%	\item $\GResMesSet[\sID]$ denotes the messages received by the owner during the second round.
-%	\item $\Gstates[\sID]$ denotes the (secret) state information {\ie} ephemeral secret keys.
-%	\item $\ListGakeSessKey[\sID]$ denotes the session key.
-%\end{itemize}
-%
-%\heading{Adversary model.} Similar to the $\AKE$ security notion, we do not allow the adversary to register adversarially controlled parties by providing long-term public keys, and the adversary has access to oracles $\CorruptO$ and $\RevealO$ as described in ~\cref{fig:game-ind-atk-gake}. We use the following boolean values to store which queries the adversary made:
+\paragraph{Execution environment.} We consider $\mu$ parties $\User[1], \ldots, \User[\mu]$, with static key pairs $(\spk_i, \ssk_i), i \in [\mu]$. 
+For each key exchange, each party in a group $\PartySet$ has its own session with a unique identification number $\sID$, and variables which are defined relative to $\sID$:
+
+
+%\paragraph{Adversary model.} Similar to the $\AKE$ security notion, we do not allow the adversary to register adversarially controlled parties by providing long-term public keys, and the adversary has access to oracles $\CorruptO$ and $\RevealO$ as described in ~\cref{fig:game-ind-atk-gake}. We use the following boolean values to store which queries the adversary made:
 %
 %\begin{itemize}
 %	\item $\corrupted[{i}]$ denotes whether the long-term secret key of party $\User[{i}]$ was given to the adversary.
@@ -197,7 +196,7 @@ Instead, implicit authentication implies that only the intended honest parties c
 %\end{itemize}
 %
 %
-%\heading{Matching sessions.} Extending the definition of matching sessions from the two-party case, we define matching sessions in the $\Gake$ setting as follows.
+%\paragraph{Matching sessions.} Extending the definition of matching sessions from the two-party case, we define matching sessions in the $\Gake$ setting as follows.
 %%\begin{itemize}
 %%	\item \textbf{Matching Sessions}: Given a set of parties $\GakeUSet$ participating in a $\Gake$ session, the set of sessions 
 %%	$\{\sID_j\}_{j \in |\GakeUSet |}$ are matching, if there exists $\GakeIniMesSet[{i}], \GakeResMesSet[{i}]$, such that for each $\User[j] \in \GakeUSet$ we have:
@@ -217,7 +216,7 @@ Instead, implicit authentication implies that only the intended honest parties c
 %%\todo{This is probably wrong and needs a fixup like we did for ake.}
 %
 %
-%\heading{Test session.} The adversary is given access to the test oracle $\TestO$. This oracle can be queried multiple times and depending on a randomly chosen bit $b \getsr \bits$ (which is shared between all test queries), it outputs either a uniformly random key, or the specified session key.  
+%\paragraph{Test session.} The adversary is given access to the test oracle $\TestO$. This oracle can be queried multiple times and depending on a randomly chosen bit $b \getsr \bits$ (which is shared between all test queries), it outputs either a uniformly random key, or the specified session key.  
 %
 %
 %%\todo{freshness+ attack table + formal def}
@@ -282,44 +281,44 @@ Instead, implicit authentication implies that only the intended honest parties c
 %	\caption{Table of attacks for adversaries against explicitly authenticated group key exchange protocols without ephemeral state reveals. An attack is regarded as an AND conjunction of variables with specified values as shown in the each line, where “--” means that this variable can take arbitrary value and {\tabfalse} means “false”.}
 %	\label{tab:wFS-optimized-table-gake}
 
+%------------------------------------------------------------------------------------
 
-
-\subsection{Hash Proof System}\label{subsec:HPF}
-We now recall the definitions of smooth projective hashing and hash proof system, introduced for the first time in \cite{CS02} and later picked up in \cite{JKRS20}.
-
-Informally, a projective hash function is a keyed hash function associated with two types of keys: the secret \textit{hashing key}, which allows for hashing of every element in the domain, and a public \textit{projective key}, that can be used to hash only those elements that lie in a designated subset (the language) of the domain.
-A projective hash function is \textit{smooth} if the projective key gives only a negligible advantage in correctly hashing an element that lies outside the designated subset.
-
-\begin{definition}[Smooth projective hashing]
-	Let $\Domain,\Codomain$ be two sets, let $\Language \subset \Domain$ be a language and let $\SKSpace,\PKSpace$ be the secret and public key spaces.
-	For any secret key $\sk \in \SKSpace$, let $\Lambda_{\sk} : \Domain \rightarrow \Codomain$ be a keyed hash function.
-	A hash function $\Lambda_{\sk}$ is \textbf{projective} if there exists a projection $\projectKey : \SKSpace \rightarrow \PKSpace$ such that the key $\pk = \projectKey(\sk)$ uniquely defines the action of $\Lambda_\sk$ on $\Language$: For every $\x \in \Language$, the digest $\y = \Lambda_\sk(\x)$ can be consistently computed from $\pk$ and $\x$.
-	
-	A projective hash function is \textbf{smooth} if, given any hashing key $\sk \getsr \SKSpace$ and its projection key $\pk = \projectKey(\sk)$, there exists only a negligible probability to successfully distinguish between samples from the distributions $D_1$ and $D_2$, where
-	\[ D_1 := \{ (\x', \pk, \y) \mid \y = \Lambda_\sk(\x')) \}_{\x' \in \Domain\setminus\Language} \quad \text{and} \quad D_2 := \{(\x', \pk, \y) \mid \y \getsr \Codomain \}_{\x' \in \Domain\setminus\Language}\]
-	Equivalently,\mattia{check this, I give a different definition here} let $\adv$ be an adversary that tries to compute the action of $\HPSHash_\sk$ on $\Domain \setminus \Language$ using the projection key $\pk = \projectKey(\sk)$ of a random $\sk \getsr \SKSpace$; then, for any $\x' \in \Domain \setminus \Language$,
-	\[ \Pr \left[ \y \gets \adv(\pk,\x')  \mid \y = \HPSHash_\sk(\x') \right] \leq \negl[\secpar]\]\mattia{Possibly add the definition of $k$-entropic}
-\end{definition}
-
-Before moving on with the definition of a hash proof system, a few assumptions need to be made.
-First, we assume that the projection function $\projectKey$ and the algorithms for sampling elements from $\Domain$ and from $\Language$ are efficient.
-Secondly, we assume that for every $\x \in \Language$, one can efficiently produce a witness $w$ proving that $\x$ belongs to the language.
-
-\begin{definition}
-	A \textbf{Hash Proof System} (HPS) consists of three algorithms $\HPS = (\HPSParam,\HPSPrivEval,\HPSPubEval)$ defined as follows:
-	\begin{itemize}
-		\item $\HPSparams: = (\HPSgroup,\Codomain,\Domain,\Language,\SKSpace,\PKSpace,\HPSHash,\projectKey)  \getsr \HPSParam (1^\secpar)$: a PPT parameter setup algorithm that outputs a parameter set $\HPSparams$ containing a possibly empty set $\HPSgroup$ of extra parameters, a codomain $\Codomain$, a domain $\Domain$, a language $\Language$, a hashing key space $\SKSpace$, a projective key space $\PKSpace$, a smooth projective hash function $\HPSHash_{(\cdot)}: \Domain \rightarrow \Codomain$ and a projection function $\projectKey: \SKSpace \rightarrow \PKSpace$;
-		\item $\y \gets \HPSPrivEval (\sk,\x)$: a deterministic private hashing algorithm that, on input a secret hashing key $\sk$ and an element $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$;
-		\item $\y \gets \HPSPubEval (\pk,\x,w)$: a deterministic public hashing algorithm that, on input a projection key $\pk = \mu(\sk)$, an element $\x \in \Language$ and a witness $w$ for the fact that $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$.
-	\end{itemize}
-\end{definition}
-
-The fundamental problem which an HPS bases its security on is the $m$- fold subset membership problem, which asks to tell elements sampled from the language apart from elements sampled in its complement.
-\begin{problem}[$m$-fold Subset Membership Problem]
-	Given $m$ elements uniformly drawn from $\Language$ and $m$ elements uniformly drawn from $\Domain \setminus \Language$, an adversary $\adv$ has a negligible advantage in distinguishing them; more formally,
-	\begin{align*} \AdvSMP :=  & \big| \Pr \left[ 1 \gets \adv(\Domain,\Language,\x_1,\dots,\x_m )  \mid \x_1,\dots,\x_m \getsr \Language \right] - \\
-		&\Pr \left[ 1 \gets \adv(\Domain,\Language,\x_1',\dots,\x_m' )  \mid \x_1',\dots,\x_m' \getsr \Domain \setminus \Language \right] \big| \leq \negl[\secpar] 
-		\end{align*}
-\end{problem}
+%\subsection{Hash Proof System}\label{subsec:HPF}
+%We now recall the definitions of smooth projective hashing and hash proof system, introduced for the first time in \cite{CS02} and later picked up in \cite{JKRS20}.
+%
+%Informally, a projective hash function is a keyed hash function associated with two types of keys: the secret \textit{hashing key}, which allows for hashing of every element in the domain, and a public \textit{projective key}, that can be used to hash only those elements that lie in a designated subset (the language) of the domain.
+%A projective hash function is \textit{smooth} if the projective key gives only a negligible advantage in correctly hashing an element that lies outside the designated subset.
+%
+%\begin{definition}[Smooth projective hashing]
+%	Let $\Domain,\Codomain$ be two sets, let $\Language \subset \Domain$ be a language and let $\SKSpace,\PKSpace$ be the secret and public key spaces.
+%	For any secret key $\sk \in \SKSpace$, let $\Lambda_{\sk} : \Domain \rightarrow \Codomain$ be a keyed hash function.
+%	A hash function $\Lambda_{\sk}$ is \textbf{projective} if there exists a projection $\projectKey : \SKSpace \rightarrow \PKSpace$ such that the key $\pk = \projectKey(\sk)$ uniquely defines the action of $\Lambda_\sk$ on $\Language$: For every $\x \in \Language$, the digest $\y = \Lambda_\sk(\x)$ can be consistently computed from $\pk$ and $\x$.
+%	
+%	A projective hash function is \textbf{smooth} if, given any hashing key $\sk \getsr \SKSpace$ and its projection key $\pk = \projectKey(\sk)$, there exists only a negligible probability to successfully distinguish between samples from the distributions $D_1$ and $D_2$, where
+%	\[ D_1 := \{ (\x', \pk, \y) \mid \y = \Lambda_\sk(\x')) \}_{\x' \in \Domain\setminus\Language} \quad \text{and} \quad D_2 := \{(\x', \pk, \y) \mid \y \getsr \Codomain \}_{\x' \in \Domain\setminus\Language}\]
+%	Equivalently,\mattia{check this, I give a different definition here} let $\adv$ be an adversary that tries to compute the action of $\HPSHash_\sk$ on $\Domain \setminus \Language$ using the projection key $\pk = \projectKey(\sk)$ of a random $\sk \getsr \SKSpace$; then, for any $\x' \in \Domain \setminus \Language$,
+%	\[ \Pr \left[ \y \gets \adv(\pk,\x')  \mid \y = \HPSHash_\sk(\x') \right] \leq \negl[\secpar]\]\mattia{Possibly add the definition of $k$-entropic}
+%\end{definition}
+%
+%Before moving on with the definition of a hash proof system, a few assumptions need to be made.
+%First, we assume that the projection function $\projectKey$ and the algorithms for sampling elements from $\Domain$ and from $\Language$ are efficient.
+%Secondly, we assume that for every $\x \in \Language$, one can efficiently produce a witness $w$ proving that $\x$ belongs to the language.
+%
+%\begin{definition}
+%	A \textbf{Hash Proof System} (HPS) consists of three algorithms $\HPS = (\HPSParam,\HPSPrivEval,\HPSPubEval)$ defined as follows:
+%	\begin{itemize}
+%		\item $\HPSparams: = (\HPSgroup,\Codomain,\Domain,\Language,\SKSpace,\PKSpace,\HPSHash,\projectKey)  \getsr \HPSParam (1^\secpar)$: a PPT parameter setup algorithm that outputs a parameter set $\HPSparams$ containing a possibly empty set $\HPSgroup$ of extra parameters, a codomain $\Codomain$, a domain $\Domain$, a language $\Language$, a hashing key space $\SKSpace$, a projective key space $\PKSpace$, a smooth projective hash function $\HPSHash_{(\cdot)}: \Domain \rightarrow \Codomain$ and a projection function $\projectKey: \SKSpace \rightarrow \PKSpace$;
+%		\item $\y \gets \HPSPrivEval (\sk,\x)$: a deterministic private hashing algorithm that, on input a secret hashing key $\sk$ and an element $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$;
+%		\item $\y \gets \HPSPubEval (\pk,\x,w)$: a deterministic public hashing algorithm that, on input a projection key $\pk = \mu(\sk)$, an element $\x \in \Language$ and a witness $w$ for the fact that $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$.
+%	\end{itemize}
+%\end{definition}
+%
+%The fundamental problem which an HPS bases its security on is the $m$- fold subset membership problem, which asks to tell elements sampled from the language apart from elements sampled in its complement.
+%\begin{problem}[$m$-fold Subset Membership Problem]
+%	Given $m$ elements uniformly drawn from $\Language$ and $m$ elements uniformly drawn from $\Domain \setminus \Language$, an adversary $\adv$ has a negligible advantage in distinguishing them; more formally,
+%	\begin{align*} \AdvSMP :=  & \big| \Pr \left[ 1 \gets \adv(\Domain,\Language,\x_1,\dots,\x_m )  \mid \x_1,\dots,\x_m \getsr \Language \right] - \\
+%		&\Pr \left[ 1 \gets \adv(\Domain,\Language,\x_1',\dots,\x_m' )  \mid \x_1',\dots,\x_m' \getsr \Domain \setminus \Language \right] \big| \leq \negl[\secpar] 
+%		\end{align*}
+%\end{problem}
 
 

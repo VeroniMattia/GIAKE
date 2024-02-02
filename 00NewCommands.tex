@@ -39,11 +39,12 @@
 \newcommand{\changehighlight}[1]{#1}
 
 %roles
+\newcommand{\Universe}{\mathcal{U}}
 \newcommand{\Party}{\mathsf{P}}
 \newcommand{\PartySet}{\setfont{P}}
 \newcommand{\User}[1][]{\Party_{#1}}
-\newcommand{\GakePk}[1][]{\pk_{#1}}
-\newcommand{\GakeSk}[1][]{\sk_{#1}}
+\newcommand{\GakePk}[1][]{\spk_{#1}}
+\newcommand{\GakeSk}[1][]{\ssk_{#1}}
 
 %keys
 \newcommand{\skS}{\sk}
@@ -91,13 +92,13 @@
 \newcommand{\orfont}[1]{\mathsc{#1}}      % Oracle font
 \newcommand{\GakeIni}{\algfont{Init}}
 \newcommand{\GakeIniO}{\orfont{Session}_\mathsf{I}}
-\newcommand{\GIni}{i}
+\newcommand{\GIni}{\User[i]}
 \newcommand{\GakeUId}{i}
 \newcommand{\cntS}{\text{cnt}_{\text{S}}}
 \newcommand{\incr}{\texttt{++}}
 \newcommand{\owner}{\text{owner}}
 \newcommand{\peer}{\text{peer}}
-\newcommand{\GakeUSet}{\mathcal{Q}}
+\newcommand{\GakeUSet}{\PartySet}
 \newcommand{\GakeIniMes}{m}
 \renewcommand{\state}{\text{st}}
 \newcommand{\Gstate}{\state}
