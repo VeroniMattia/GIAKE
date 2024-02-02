@@ -1,8 +1,10 @@
 \documentclass[runningheads,envcountsame]{llncs}
 \input{00UsePackage}
 \input{00NewCommands}
+\bibliographystyle{splncs03}
 \usepackage{ulem}
 \usepackage{nicodemus}
+\usepackage{xspace}
 \usepackage{stmaryrd}
 \usepackage{mathtools}
 \usepackage{dashbox}
@@ -52,7 +54,8 @@
 	\input{Security}
 	\input{Conclusions}
 	
-	\bibliographystyle{alpha}
-	\bibliography{abbrev0,bibliography}
+
+	\bibliography{cryptobib/abbrev3,cryptobib/crypto,add}
+%	\bibliography{abbrev0,bibliography}
 	
 \end{document}
