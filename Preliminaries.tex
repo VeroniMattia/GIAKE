@@ -76,9 +76,9 @@ In particular, we let PKI register the party identities according to some orderi
 
 \subsection{Security model for GIAKE}\label{subsec:secmodel}
 We now describe a security model for a two-round broadcast group authenticated key exchange, that allows a set of $n > 2$ parties to establish a common secret key.
-The adversarial model is borrowed from \cite[Section 6.1]{JC:PQR22}, which is in itself an extension of the model described in \cite{EC:JKRS21}.
-Since we aim for implicit authentication for our 2-round protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-round key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{HMQV}.
-In particular, w.r.t. \cite[Section 6.1]{PQR22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an ephemeral key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
+The adversarial model is borrowed from \cite[Section 6.1]{JC:PanQiaRin22}, which is in itself an extension of the model described in \cite{EC:JKRS21}.
+Since we aim for implicit authentication for our 2-round protocol, we have to content ourselves with the notion of \textit{weak Forward Secrecy} (wFS), since no unsigned 2-round key-exchange protocol can hope for (full) Forward Secrecy \cite[Section 3.2]{C:Krawczyk05}.
+In particular, w.r.t. \cite[Section 6.1]{JC:PanQiaRin22} we do not allow the adversary to actively participate in the session.\mattia{Argument: the adversary can act like party $\User[i]$ sending an ephemeral key of its choice, since it is unauthenticated. Then it reveals the long-term key of $\User[i]$ and computes the session key.}
 
 In this security model, no mechanism to provide explicit message authentication is considered.
 Instead, implicit authentication implies that only the intended honest parties can successfully compute the group key for the session.
