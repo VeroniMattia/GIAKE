@@ -23,21 +23,24 @@
 	
 	
 	\author{Jiaxin Pan\inst{1}
-		and Mattia Veroni\inst{2}}
+		and Mattia Veroni\inst{2}\thanks{Supported by Research Council of Norway under Project No. 32423}}
 	\authorrunning{J. Pan, M. Veroni}
 	
 	\institute{University of Kassel, Kassel, Germany \\
 		\email{}
-		\and  NTNU - Norwegian University of Science and Technology, Trondheim, NO , \\
+		\and  NTNU - Norwegian University of Science and Technology, Trondheim, Norway \\
 		\email{mattia.veroni@ntnu.no}}
 	
 	\maketitle           
 	
 	\raggedbottom
 	\begin{abstract}
-		Short and captivating advertisement about our incredible work.      
+		We construct an efficient group authenticated key exchange protocol from weak assumptions in the random oracle model. Compared with the signature-based protocol (Pan, Qian, and Ringerud, Journal of Cryptology 2022) and the multilinear-map-based protocol (Li and Yang, CANS 2013), our protocol does not require any signature and has security based on the Diffie-Hellman assumption without pairings. 
 		
-		\keywords{Keyword 1 \and Keyword 2}
+		\quad Our protocol can be viewed as a multiparty variant of the \textsf{X3DH} protocol. It is session-tight, meaning the security of our protocol is independent of the number of sessions, but dependent linearly of the number of users. Compared with the signature-based protocol of Pan et al., although our protocol is only session-tight, it is X \% more efficient.
+		\jiaxin{I will updated it after the efficiency table is done.}
+		
+		\keywords{Group authenticated key exchange \and Tightness \and Random oracles}
 	\end{abstract}
 	
 	\setlength{\tabcolsep}{3pt}
