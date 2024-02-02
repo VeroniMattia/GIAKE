@@ -139,35 +139,40 @@ Instead, implicit authentication implies that only the intended honest parties c
 					\item $\GResMesSet[\sID] \coloneqq \GakeResMesSet[{i}]$ \label{line:gake-problem-b}
 					\item $\GakeIniMesSet[{i}] \coloneqq \GIniMesSet[\sID]$
 					\item $\GakeSessKey \coloneqq \GakeDer(\GakeSk[{i}], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}], \GakeResMesSet[{i}])$
-%					\item $\skeys[\GakeResUsID] :=  \GakeSessKey$
-%					\item \pcreturn $\emptystr$\\
+					\item $\skeys[\GakeResUsID] :=  \GakeSessKey$
+					\item \pcreturn $\emptystr$\\
 				\end{nicodemus}
 				\underline{$\RevealO(\sID)$}
-%				\begin{nicodemus}
-%					\item $\revealed[\sID] \coloneqq \true$
-%					\item $\pcreturn \skeys[\sID]$	\\	
-%				\end{nicodemus}
-%				
+				\begin{nicodemus}
+					\item $\revealed[\sID] \coloneqq \true$
+					\item $\pcreturn \skeys[\sID]$	\\	
+				\end{nicodemus}
+				
 				\underline{$\CorruptO(n \in [\mu])$}
-%				\begin{nicodemus}
-%					\item $\corrupted[n] := \true$
-%					\item $\pcreturn \sk_n$\\
-%				\end{nicodemus}
+				\begin{nicodemus}
+					\item $\corrupted[n] := \true$
+					\item $\pcreturn \sk_n$\\
+				\end{nicodemus}
 				
 				\underline{$\TestO(\sID$)}
-%				\begin{nicodemus}
-%					\item $\pcif \sid\in\testSessions~ \pcreturn \bot$ \gcom{already tested}
-%					\item \pcif $\skeys[\sID] = \bot$~\pcreturn $\bot$
-%					\item $\testSessions \coloneqq \testSessions \cup \{\sid\}$
-%					\item $K_0^* \coloneqq \skeys[\sID]$
-%					\item $K_1^* \uni \mathcal{K}$
-%					\item \pcreturn $K_b^*$
-%				\end{nicodemus}
+				\begin{nicodemus}
+					\item $\pcif \sid\in\testSessions~ \pcreturn \bot$ \gcom{already tested}
+					\item \pcif $\skeys[\sID] = \bot$~\pcreturn $\bot$
+					\item $\testSessions \coloneqq \testSessions \cup \{\sid\}$
+					\item $K_0^* \coloneqq \skeys[\sID]$
+					\item $K_1^* \getsr \mathcal{K}$
+					\item \pcreturn $K_b^*$
+				\end{nicodemus}
 			\end{minipage}
 	}}
-	\caption{}
+	\caption{
+	Game $\GIAKEsecurityPFSGame$ for $\GIAKE$.
+	The number of messages in the set $\GakeIniMesSet[\GakeUId]$ is denoted by $|\GakeIniMesSet[\GakeUId]|$, and 
+	$|\peers_\GakeUId|$ denotes the number of parties in $\peers_\GakeUId$.
+	%\jpnote{I think there is something wrong to define $\GakeIniMesSet[\GakeUId]$ as a set. It has to be at least an ordered set.}
+	\label{fig:game-ind-atk-gake}}
 \end{figure}
-%\chen{maybe we need to modify this a little bit according to the fig 21. Need to be discussed}
+
 
 %\heading{Execution environment.} We consider $\mu$ parties $\PartySet = (\User[1], \ldots, \User[\mu])$ with long-term key pairs $(\pk_i, \sk_i), i \in [\mu]$. For each group key exchange, each party in a group $\GakeUSet$ has their own session with a unique identification number $\sID$, and variables which are defined relative to $\sID$:
 %
