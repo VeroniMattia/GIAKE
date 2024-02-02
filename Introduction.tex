@@ -1,5 +1,7 @@
 \newcommand{\introGAKE}{\text{GAKE}\xspace}
 \newcommand{\introAKE}{\text{AKE}\xspace}
+\newcommand{\introNumSess}{s}
+\newcommand{\introNumUser}{n}
 
 
 \section{Introduction}\label{sec:introduction}
@@ -8,11 +10,21 @@ A group authenticated key exchange (\introGAKE) protocol allows a group of users
 In the end, we require that the shared session key from a \introGAKE should be pseudo-random.
 
 \paragraph{Existing Constructions.}
-Constructing secure \introGAKE protocols has a long history, and almost all the existing protocols \cite{} are constructed via a signature-based approach. Namely, it uses a digital signature scheme to authenticate a passively secure group key protocol.
+Constructing secure \introGAKE protocols has a long history, and almost all the existing protocols \cite{CCS:BCPQ01,AC:BreChePoi01,EC:BreChePoi02,PQCRYPTO:ADGK19,JC:PanQiaRin22} are constructed via a signature-based approach. Namely, it uses a digital signature scheme to authenticate a passively secure group key protocol. Such a signature-based approach is rather inefficient. We take the protocol in \cite{JC:PanQiaRin22} as an example: To agree on a session key with a group of $n$ users, each user needs to run the signing algorithm 2 times and the verification algorithm $3(n-1)$ times. With Schnorr's signature scheme, this already requires $2+6(n-1)$ times group exponentiation. Taking the security loss of Schnorr's signature into account, this can be very inefficient in practice. Hence, we are interested in constructing a secure \introGAKE without signatures in this paper.
+
+To the best of our knowledge, the work of Li and Yang \cite{CANS:LiYan13} is the only signature-less \introGAKE protocol. However, it requires the use of (cryptographic) multilinear maps \cite{EC:GarGenHal13}, which is a rather strong requirement. Until now, we do not know any efficient multilinear maps. This leads to the first goal of our work, namely, to construct a \textit{signature-less} \introGAKE protocol from \textit{a weak, standard assumption.}
+
+%\begin{displayquote}
+%	\emph{Our First Goal:} Constructing a secure \introGAKE protocol from a weak, standard assumption.
+%\end{displayquote} 
 
 % They all have single-Test query
 
 \paragraph{Tight Security.}
+Moreover, most of the aforementioned protocols have large security loss. For instance, the protocol of Bresson, Chevassute, and Pointcheval \cite{AC:BreChePoi01} has security loss $O(\introNumUser \cdot \introNumSess)$, where $\introNumUser$ and $\introNumSess$ are the numbers of users and sessions per user, respectively. Even worse, protocols in \cite{CCS:BCPQ01,CANS:LiYan13} lose at least an exponential factor $\introNumSess^{\introNumUser}$. This makes it particularly inefficient to instantiate these protocols in a theoretically sound manner.
+%Say all existing protocols have large security loss
+
+\jiaxin{Explain tight security, etc...}
 
 \paragraph{``Sweet-spot'' between Efficiency and Tightness.}
 We are interested in tightness, but more into searching the sweet-spot between tightness and efficiency.
@@ -20,10 +32,12 @@ We are interested in tightness, but more into searching the sweet-spot between t
 %A group authenticated key exchange %(\introGAKE) protocol allows a group of users to agree on a shared session key in the present of an active adversary. It extends the \introAKE protocol from 2-party to $n$-party setting. Similar to the security requirements of 
 %>>>>>>> cbdb7a8770ca4858481090c54c9d65cf24400923
 
-\subsection{Our Contribution.}
+\subsection{Our Contribution}
 How magnificent have we been?
 
-Our efficiency $\approx$ $3\times $ BD, but much less than the Sign-GAKE (2*Sign + 3*Ver) per user.
+Our efficiency $\approx$ $3\times $ BD, but much less than the Sign-GAKE (2*Sign + 3(n-1)*Ver) per user.
+
+\paragraph{Technical Overview: A Simple Twist on BD.}
 
 \paragraph{Open Problems.}
 We leave constructing an efficient signature-less post-quantum \introGAKE protocol as an interesting open problem. 
