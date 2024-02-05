@@ -88,8 +88,11 @@ The challenger generates keys for all parties in $\Universe$, tosses a coin $b$ 
 The adversary has then to guess the bit $b$, based on the following additional oracle calls:
 \begin{itemize}
 	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to initiate a group key exchange session with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the initialisation algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
-	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to proceed with the response phase in session $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in response to its initialisation message. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round
-	\item with $\GakeDerO(\GakeResUsID \in [\cntS],  \GakeResMesSet[{i}])$, the adversary triggers $\owner[\sID]$ to proceed with the key derivation in session $\sID$, using $\GakeResMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted after its response message $\GakeResMes_{i}$. We let $\Gstates[\sID]$ denote the (secret) state information, i.e. ephemeral secret keys, $\ListGakeSessKey[\sID]$ denote the session key, and $\emptystr$ denote an empty string.
+	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to proceed with the response phase in session $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in response to its initialisation message. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round, and $\peercorrupted[\sID]$ denote whether one of the peers in the session was corrupted (its static key has been revealed to $\adv$ prior to the session key derivation)
+	\item with $\GakeDerO(\GakeResUsID \in [\cntS],  \GakeResMesSet[{i}])$, the adversary triggers $\owner[\sID]$ to proceed with the key derivation in session $\sID$, using $\GakeResMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted after its response message $\GakeResMes_{i}$. We let $\Gstates[\sID]$ denote the (secret) state information, i.e. ephemeral secret keys, $\ListGakeSessKey[\sID]$ denote the session key, and $\emptystr$ denote an empty string
+	\item with $\RevealO(\sID)$, the adversary gets from the challenger the session key computed at the end of session $\sID$. We let $\revealed[\sID]$ denote whether the group session key for the session $\sID$ was revealed or not
+	\item with $\CorruptO(n \in [\mu])$, the adversary corrupts user $n$, obtaining its static secret key $\ssk_n$. We let $\corrupted[{i}]$ denote whether the static secret key of  $\User[{i}]$ was leaked or not
+	\item with $\TestO(\sID)$, the adversary requires to be tested on session $\sID$. If any session was computed, the challenger responds either with the real session key or with a random key, depending on the bit $b$ sampled at the beginning of the game.
 \end{itemize}
 
 
@@ -160,7 +163,7 @@ The adversary has then to guess the bit $b$, based on the following additional o
 				\underline{$\CorruptO(n \in [\mu])$}
 				\begin{nicodemus}
 					\item $\corrupted[n] := \true$
-					\item $\pcreturn \sk_n$\\
+					\item $\pcreturn \ssk_n$\\
 				\end{nicodemus}
 				
 				\underline{$\TestO(\sID$)}
