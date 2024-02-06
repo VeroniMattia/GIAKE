@@ -24,7 +24,7 @@ In particular, we let PKI register the party identities according to some orderi
 	\begin{itemize}
 		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$.
 		Each party $\User[i]$ preventively produces a static key pair $(\ssk_i,\spk_i) \getsr \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI;
-		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})$: a PPT session initialisation algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
+		\item $(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})$: a PPT session Initialization algorithm that, on input a party's static secret key $\ssk_i$ and the static public keys of the intended participants in the session, outputs a message $\messageIni$ and a state $\st$;
 		\item $(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n})$: a (possibly PPT) algorithm that, on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $m_j$ (each broadcasted by the party with static public key $\spk_j$ after running the $\GAKEIni$ algorithm), outputs a message $\hat{m}_i$ and updates the state $\st$;
 		\item $K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n})$: a deterministic algorithm that,  on input a party's static secret key $\ssk_i$, a state $\st$ and the messages $(m_j,\hat{m}_j)$ output by each party $\User[j]$ with static public key $\spk_j$, derives a session key.
 	\end{itemize}
@@ -67,7 +67,7 @@ In particular, we let PKI register the party identities according to some orderi
 
 	We now describe a protocol run as viewed by party $\User[i]$, an illustration of which is given in \Cref{fig:giakeprocedure}.
 	In the setup phase, each party $\User[i]$ generates a static key-pair $(\ssk_i,\spk_i) \gets \KeyGen(1^\secpar)$ and registers the public key $\spk_i$ to the PKI.
-	In the first round, each party runs the initialisation algorithm \[(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})\] on input its static secret key and the intended parties' public keys. 
+	In the first round, each party runs the Initialization algorithm \[(m_i,\st) \getsr \GAKEIni (\ssk_i,(\spk_j)_{1\leq j \leq n})\] on input its static secret key and the intended parties' public keys. 
 	The resulting outputs are an internal state $\st$ and a message $m_i$, the latter of which is broadcasted together with $i$.
 	Upon retrieving $\{(j,m_j)\}_{1\leq j \leq n, j \neq i}$ from the broadcast channel, each party runs the response algorithm \[(\hat{m}_i,\st) \gets \GAKERes(\ssk_i,\st,(\spk_j,m_j)_{1\leq j \leq n}),\] updating its internal state and broadcasting $(i,\hat{m}_i)$.
 	In the last phase, each party derives the group key for the session by running \[K \gets \GAKEDer (\spk_i,\st,(\spk_j,m_j,\hat{m}_j)_{1\leq j \leq n}).\]
@@ -105,7 +105,7 @@ Depicted in \Cref{fig:game-ind-atk-gake}, {\textbf{GAME} $\GIAKEsecurityPFSGame$
 					\item $\pcreturn \bool{b=b'}$ \\
 				\end{nicodemus}
 				\underline{$\FreshnessO(\sID^*)$}
-				\begin{nicodemus}[1]
+				\begin{nicodemus}
 					\item $({i}^\star, \GakeUSet^\star) := (\owner[\sID^*], \GakeUSet[\sID^*])$						
 					\item $\matchingSessions \coloneqq \{\sID \mid   \owner[\sID] \neq  {i}^\star~ \wedge ~ \GakeUSet[\sID]= \GakeUSet^\star ~$\\ 
 					\hspace*{2em}$ \wedge~\changehighlight{\{\GIniMes[\sID]\}} \cup \GIniMesSet[\sID] = \changehighlight{\{\GIniMes[\sID^*]\}}\cup \GIniMesSet[\sID^*] ~$\\
@@ -122,7 +122,7 @@ Depicted in \Cref{fig:game-ind-atk-gake}, {\textbf{GAME} $\GIAKEsecurityPFSGame$
 					\item $\matchingSessions \coloneqq \{\sID \mid   \owner[\sID] \neq  {i}^\star~ \wedge ~ \GakeUSet[\sID]= \GakeUSet^\star ~$\\ 
 					\hspace*{2em}$ \wedge~\changehighlight{\{\GIniMes[\sID]\}} \cup \GIniMesSet[\sID] = \changehighlight{\{\GIniMes[\sID^*]\}}\cup \GIniMesSet[\sID^*] ~$\\
 					\hspace*{2em}$ \wedge~\changehighlight{\{\GResMes[\sID]\}} \cup \GResMesSet[\sID] = \changehighlight{\{\GResMes[\sID^*]\}}\cup \GResMesSet[\sID^*]\}$ \gcom{matching sessions}
-					\item $\pcfor \attack\in$\hspace*{-0.1em} Table wFS-optimized-table-gake
+					\item $\pcfor \attack\in$\hspace*{-0.1em} {\color{red}{Table wFS-optimized-table-gake}}
 					\item \quad $\pcif \attack=\pctrue~ $
 					\item \quad \quad $\pcreturn \pctrue$\label{line:attack-true-2-gake}
 					\item \pcreturn \pcfalse
@@ -141,7 +141,7 @@ The adversary has then to guess the bit $b$, based on the some additional oracle
 We also consider two helper procedures, $\FreshnessO$ and $\ValidAttackO$, for game $\GIAKEsecurityPFSGame$ defined in \Cref{fig:game-ind-atk-gake}:
 \begin{itemize}
 	\item with procedure $\FreshnessO$, the challenger checks whether the adversary performed some trivial attacks: for each session $\sID\in \testSessions$ that $\adv$ asked to be tested on, it checks whether the adversary queried for the session key of $\sID^*$ or for the session key of any session matching $\sID^*$
-	\item with procedure $\ValidAttackO$, each attack is evaluated by the set of variables shown in \cref{tab:wFS-optimized-table-gake} and checks if an allowed attack was performed. 
+	\item with procedure $\ValidAttackO$, each attack is evaluated by the set of variables shown in \Cref{tab:wFS-optimized-table-gake} and checks if an allowed attack was performed. 
 	If the values of the variables are set as in the corresponding row, the attack was performed, i.e. $\attack=\pctrue$ and the session is valid.
 \end{itemize}
 
@@ -149,8 +149,8 @@ We also consider two helper procedures, $\FreshnessO$ and $\ValidAttackO$, for g
 \paragraph{The adversarial model.}
 The goal of the adversary is to guess the bit $b$ sampled by the challenger, based on the following additional oracle calls:
 \begin{itemize}
-	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to run the initialisation phase of a group key exchange with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the initialisation algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
-	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to run the response phase for the session with identifier $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in the initialisation phase. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round, and $\peercorrupted[\sID]$ denote whether one of the peers in the session was corrupted (its static key has been revealed to $\adv$ prior to the session key derivation)
+	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to run the Initialization phase of a group key exchange with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the Initialization algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
+	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to run the Response phase for the session with identifier $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in the Initialization phase. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round, and $\peercorrupted[\sID]$ denote whether one of the peers in the session was corrupted (its static key has been revealed to $\adv$ prior to the session key derivation)
 	\item with $\GakeDerO(\GakeResUsID \in [\cntS],  \GakeResMesSet[{i}])$, the adversary triggers $\owner[\sID]$ to proceed with the key derivation in session $\sID$, using $\GakeResMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted after its response message $\GakeResMes_{i}$. We let $\Gstates[\sID]$ denote the (secret) state information, i.e. ephemeral secret keys, $\ListGakeSessKey[\sID]$ denote the session key, and $\emptystr$ denote an empty string
 	\item with $\RevealO(\sID)$, the adversary gets from the challenger the session key computed at the end of session $\sID$. We let $\revealed[\sID]$ denote whether the group session key for the session $\sID$ was revealed or not
 	\item with $\CorruptO(n \in [\mu])$, the adversary corrupts user $n$, obtaining its static secret key $\ssk_n$. We let $\corrupted[{i}]$ denote whether the static secret key of  $\User[{i}]$ was leaked or not
@@ -163,7 +163,7 @@ The goal of the adversary is to guess the bit $b$ sampled by the challenger, bas
 		\fbox{\small
 			\begin{minipage}[t]{0.6\textwidth}
 				\underline{$\GakeIniO ( \GIni  \in \Universe, \PartySet_{i} \subseteq \Universe)$}
-\begin{nicodemus}
+\begin{nicodemus}[1]
 	\item $\cntS~\incr$
 	\item $\sID \coloneqq \cntS$
 	\item $\owner[\sID]:=\GIni $ 
@@ -182,7 +182,7 @@ The goal of the adversary is to guess the bit $b$ sampled by the challenger, bas
 	\item \quad  \pcreturn $\bot$ \gcom{all peers must have broadcasted}
 	\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet_{i}} \corrupted[j]$
 	\item $\GIniMesSet[\sID] \coloneqq  \GakeIniMesSet[{i}]$ \label{line:gake-problem-a}
-	\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[i], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
+	\item $(\GakeResMes_{i}, \Gstate) \getsr \GakeRes(\GakeSk[i], \{\GakePk[j]\}_{j \in \PartySet_{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}])$
 	\item $\GResMes[\sID]:=({i},\GakeResMes_{i})$
 	\item $\Gstates[\sID]:= \Gstate$
 	\item \pcreturn $\GakeResMes_{i}$ \\
@@ -191,12 +191,12 @@ The goal of the adversary is to guess the bit $b$ sampled by the challenger, bas
 \begin{nicodemus}
 	\item \pcif $\skeys[\GakeResUsID] \neq \bot$  
 	\item \quad \pcreturn $\bot$
-	\item $({i},\PartySet{i}) := (\owner[\GakeResUsID],\peer[\GakeResUsID])$
-	\item \pcif $|\GakeResMesSet[{i}]| \neq |\PartySet{i}|$ \pcreturn $\bot$
-	\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet{i}} \corrupted[j]$
+	\item $({i},\PartySet_{i}) := (\owner[\GakeResUsID],\peer[\GakeResUsID])$
+	\item \pcif $|\GakeResMesSet[{i}]| \neq |\PartySet_{i}|$ \pcreturn $\bot$
+	\item $\peercorrupted[\sID] := \bigvee\limits_{ j \in \PartySet_{i}} \corrupted[j]$
 	\item $\GResMesSet[\sID] \coloneqq \GakeResMesSet[{i}]$ \label{line:gake-problem-b}
 	\item $\GakeIniMesSet[{i}] \coloneqq \GIniMesSet[\sID]$
-	\item $\GakeSessKey \coloneqq \GakeDer(\GakeSk[{i}], \{\GakePk[j]\}_{j \in \PartySet{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}], \GakeResMesSet[{i}])$
+	\item $\GakeSessKey \coloneqq \GakeDer(\GakeSk[{i}], \{\GakePk[j]\}_{j \in \PartySet_{i}}, \Gstates[\GakeResUsID], \GakeIniMesSet[{i}], \GakeResMesSet[{i}])$
 	\item $\skeys[\GakeResUsID] :=  \GakeSessKey$
 	\item \pcreturn $\emptystr$\\
 \end{nicodemus}
@@ -231,7 +231,7 @@ The goal of the adversary is to guess the bit $b$ sampled by the challenger, bas
 \end{figure}
 
 \paragraph{Matching sessions.} Since identifiers are for local session, we need to determine whether two (or more) of them are meant to be part of the same global session. 
-Given a set $\PartySet$ of parties in a global $\GIAKE$ session, the sessions $\sid_{i}, \sid_j$ are \textit{matching} if they have different owners, equal party sets, same messages exchanged during the initialisation phase and in the response phase:
+Given a set $\PartySet$ of parties in a global $\GIAKE$ session, the sessions $\sid_{i}, \sid_j$ are \textit{matching} if they have different owners, equal party sets, same messages exchanged during the Initialization phase and in the Response phase:
 	\begin{align*}
 		\owner[\sID_{i}] &\neq \owner[\sID_j] \\
 		\GakeUSet[\sID_{i}] &= \GakeUSet[\sID_j]  \\
@@ -239,32 +239,32 @@ Given a set $\PartySet$ of parties in a global $\GIAKE$ session, the sessions $\
 		\changehighlight{\{\GResMes[\sID_{i}]\}} \cup \GResMesSet[\sID_{i}] &= \changehighlight{\{\GResMes[\sID_j]\}}\cup \GResMesSet[\sID_j]  
 	\end{align*}
 Note that the index $j$ for the position of party $\User[j]$ in the ordered set $\PartySet$ is in general different from the party's index in the universe $\Universe$.
-%
-%
-%\setlength\extrarowheight{1pt}
-%\begin{table}[t]
-%	\begin{center}
-%		\scalebox{0.92}{
-%			\begin{tabular}{|p{0.8cm}p{6cm}|C{.5cm}|C{1.2cm}|}
-%				\hline
-%				& \begin{minipage}[t][1cm][b]{5cm} $\A$ gets ($\owner[\sid^*], \PartySet{i} \coloneqq \peer[\sid^*]$)\end{minipage}
-%				& \rotatebox{90}{\parbox{2.7cm}{$\peercorrupted[\sid^*]$}}& \rotatebox{90}{\parbox{2.5cm}{$|\matchingSessions|$}} \\
-%				\hline\hline
-%				%
-%				0. & {\bf multiple matching sessions}  & --  & $  > |\PartySet{i}|$  \\
-%				\hline
-%				\hline
-%				1. & {\bf (long-term, long-term)}   & --  &  $=|\PartySet{i}|$\\
-%				\hline
-%				\hline
-%				2. & {\bf (long-term, long-term)}  & \tabfalse & $ < |\PartySet{i}|$  \\
-%				\hline
-%			\end{tabular}
-%		}
-%	\end{center}
-%	\caption{Table of attacks for adversaries against explicitly authenticated group key exchange protocols without ephemeral state reveals. An attack is regarded as an AND conjunction of variables with specified values as shown in the each line, where “--” means that this variable can take arbitrary value and {\tabfalse} means “false”.}
-%	\label{tab:wFS-optimized-table-gake}
 
+
+\setlength\extrarowheight{1pt}
+\begin{table}[t]
+	\begin{center}
+		\scalebox{0.92}{
+			\begin{tabular}{|p{1em} c|c|c|}
+				\hline
+				& $\adv$ gets ($\owner[\sid^*], \PartySet_{i} \coloneqq \peer[\sid^*]$)
+				&$\peercorrupted[\sid^*]$ & $|\matchingSessions|$ \\
+				\hline\hline
+				%
+				0. & {\bf multiple matching sessions}  & --  & $  > |\PartySet_{i}|$  \\
+				\hline
+				\hline
+				1. & {\bf (long-term, long-term)}   & --  &  $=|\PartySet_{i}|$\\
+				\hline
+				\hline
+				2. & {\bf (long-term, long-term)}  & \tabfalse & $ < |\PartySet_{i}|$  \\
+				\hline
+			\end{tabular}
+		}
+	\end{center}
+	\caption{Table of attacks for adversaries against explicitly authenticated group key exchange protocols without ephemeral state reveals. An attack is regarded as an AND conjunction of variables with specified values as shown in the each line, where “--” means that this variable can take arbitrary value and {\tabfalse} means “false”.}
+	\label{tab:wFS-optimized-table-gake}
+\end{table}
 %------------------------------------------------------------------------------------
 
 %\subsection{Hash Proof System}\label{subsec:HPF}

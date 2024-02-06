@@ -1,98 +1,80 @@
 \section{Protocol}\label{sec:protocol}
-In this section we present our first protocol \mattia{name of the protocol}, presented from the viewpoint of party $\User[i]$.
+In this section we present our first protocol \mattia{name of the protocol}, focusing on the session of party $\User[i]$.
 We then show its correctness, expanding the computation that $\User[i]$ performs in the key-derivation phase.
 We prove the protocol secure \mattia{security notion and model} in \Cref{sec:security}.
 
-
-%\begin{figure}
-%	\centering 
-%	\fbox{
-%	\begin{tikzpicture}[ampersand replacement=\&]
-%		\matrix (m)[matrix of nodes, column  sep=1.1em,row  sep=1mm,%
-%		nodes={anchor=west}]{
-%			%Parties
-%			\underline{$\User[1](\ssk_1, \spk_1)$}\& \underline{$\User[2](\ssk_2, \spk_2)$} \&  \underline{$\User[n](\ssk_n, \spk_n)$} \\	
-%			% Init
-%			\hline$_\GAKEIni$ \\
-%			fetch$(\spk_2,\spk_3,\dots,\spk_n)$ \& fetch$(\spk_1,\spk_3,\dots,\spk_n)$ \& fetch$(\spk_1,\spk_2,\dots,\spk_{n-1})$\\
-%			$(\esk_1,\epk_1) \getsr \KeyGen(1^\secpar)$ \& $(\esk_2,\epk_2) \getsr \KeyGen(1^\secpar)$ \&  $(\esk_n,\epk_n) \getsr \KeyGen(1^\secpar)$  \\
-%
-%			broadcast($\epk_1$)\&broadcast($\epk_2$) \& broadcast($\epk_n$) \\
-%				\hline$_\GAKERes$\\
-%			% Resp
-%			%fetch($E_2,E_3,\dots,E_n$) \& fetch($E_1,E_3,\dots,E_n$) \& fetch($E_1,E_2,\dots,E_{n-1}$)\\
-%			$\hat{K}_1^\text{se} \gets \left( \dfrac{\epk_2}{\epk_n}\right)^{\ssk_1}$ \& $\hat{K}_2^\text{se} \gets \left( \dfrac{\epk_3}{\epk_1}\right)^{\ssk_2}$   \&   $\hat{K}_n^\text{se} \gets \left( \dfrac{\epk_1}{\epk_{n-1}}\right)^{\ssk_n}$ 	\\
-%			$\hat{K}_1^\text{es} \gets \left( \dfrac{\spk_2}{\spk_n}\right)^{\esk_1}$ \& $\hat{K}_2^\text{es} \gets \left( \dfrac{\spk_3}{\spk_1}\right)^{\esk_2}$  \& $\hat{K}_n^\text{es} \gets \left( \dfrac{\spk_1}{\spk_{n-1}}\right)^{\esk_n}$	\\
-%			$\hat{K}_1^\text{ee} \gets \left( \dfrac{\epk_2}{\epk_n}\right)^{\esk_1}$ \& $\hat{K}_2^\text{ee} \gets \left( \dfrac{\epk_3}{\epk_1}\right)^{\esk_2}$  \&   $\hat{K}_n^\text{ee} \gets \left( \dfrac{\epk_1}{\epk_{n-1}}\right)^{\esk_n}$ 	\\
-%			$\hat{m}_1 \gets (\hat{K}_1^\text{se},\hat{K}_1^\text{es},\hat{K}_1^\text{ee})$ \& $\hat{m}_2 \gets (\hat{K}_2^\text{se},\hat{K}_2^\text{es},\hat{K}_2^\text{ee})$ \&  $\hat{m}_n \gets (\hat{K}_n^\text{se},\hat{K}_n^\text{es},\hat{K}_n^\text{ee})$\\
-%			broadcast($\hat{m}_1$) \&broadcast($\hat{m}_2$) \& broadcast($\hat{m}_n$) \\
-%				\hline$_\GAKEDer$\\
-%			$K_i^{se} \gets E_{i-1}^{ns_i} \cdot (\hat{K}_1^\text{se})^{n-1} \cdot (\hat{K}_2^\text{se})^{n-2} \cdots \hat{K}_{n-2}^\text{se}$ \& \& \& \\
-%		};
-%	\end{tikzpicture}
-%	}
-%	\caption{Our protocol.}\label{fig:ourprotocol}
-%\end{figure}
-
-\begin{figure}[h]
-	\centering 
-	\fbox{
-		\begin{tikzpicture}[ampersand replacement=\&]
-			\matrix (m)[matrix of nodes, column  sep=1.1em,row  sep=1mm,%
-			nodes={anchor=west}]{
-				%Parties
-				 \underline{$\User[i](\ssk_i, \spk_i)$}  \\	
-				% Init
-				\hline$\GAKEIni$ \\
-				fetch$(\spk_1,\spk_2,\dots,\spk_{i-1},\spk_{i+1},\dots,\spk_{n})$\\
-				$(\esk_i,\epk_i) \getsr \KeyGen(1^\secpar)$  \\
-				broadcast($\epk_i$) \\
-				\hline$\GAKERes$\\
-				% Resp
-				%fetch($E_2,E_3,\dots,E_n$) \& fetch($E_1,E_3,\dots,E_n$) \& fetch($E_1,E_2,\dots,E_{n-1}$)\\
-				$\hat{K}_i^\text{(se)} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\ssk_i}$ 	\\
-				$\hat{K}_n^\text{(es)} \gets \left( \dfrac{\spk_{i+1}}{\spk_{i-1}}\right)^{\esk_i}$ 	\\
-				$\hat{K}_n^\text{ee} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\esk_i}$ 	\\
-				$\hat{m}_i \gets (\hat{K}_i^\text{(se)},\hat{K}_i^\text{(es)},\hat{K}_i^\text{ee})$ \\
-				broadcast($\hat{m}_i$) \\
-				\hline$\GAKEDer$\\
-				$K_i^{(se)} \gets E_{i-1}^{ns_i} \cdot (\hat{K}_i^\text{(se)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(se)})^{n-2} \cdots \hat{K}_{i-2}^\text{(se)}$  \\
-				$K_i^{(es)} \gets S_{i-1}^{n\esk_i} \cdot (\hat{K}_i^\text{(es)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(es)})^{n-2} \cdots \hat{K}_{i-2}^\text{(es)}$  \\
-				$K_i^{(ee)} \gets E_{i-1}^{n\esk_i} \cdot (\hat{K}_i^\text{(ee)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(ee)})^{n-2} \cdots \hat{K}_{i-2}^\text{(ee)}$  \\
-				$K \gets K_i^{(se)} \cdot K_i^{(es)} \cdot K_i^{(ee)}$\\
-			};
-		\end{tikzpicture}
-	}
-	\caption{The protocol view of $\User[i]$.}\label{fig:ourprotocol}
+\begin{figure}
+	\begin{adjustbox}{varwidth=0.9\textwidth,fbox,center,scale=0.92}
+	\begin{subfigure}[t]{.45\linewidth}
+		\underline{$\GAKEIni(\PartySet_i)$:}\smallskip
+		\begin{nicodemus}[1]
+			\item \pcfetch $(S_j)_{\User[j]\in \PartySet_i}$
+			\item $(\esk_i,\epk_i) \getsr \KeyGen(1^\secpar)$  
+			\item $m_i \gets (\User[i],\epk_i)$
+			\item \pcbroadcast $m_i$
+		\end{nicodemus}
+	\end{subfigure}%
+	\begin{subfigure}[t]{.5\linewidth}
+		\underline{$\GAKERes((\spk_j)_{\User[j] \in \PartySet_i},\GakeIniMesSet[i],\ssk_i,\esk_i)$:} \smallskip
+		\begin{nicodemus}
+			\item $\tempsek{i} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\ssk_i}$ 	
+			\item $\tempesk{i} \gets \left( \dfrac{\spk_{i+1}}{\spk_{i-1}}\right)^{\esk_i}$ 	
+			\item $\tempeek{i} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\esk_i}$ 	
+			\item $\hat{m}_i \gets (\User[i],\tempsek{i},\tempesk{i},\tempeek{i})$ 
+			\item \pcbroadcast $\hat{m}_i$ \\
+		\end{nicodemus}
+	\end{subfigure}
+	\begin{subfigure}{0.7\linewidth}
+		\underline{$\GAKEDer(\GakeResMesSet[i])$:} \smallskip
+		\begin{nicodemus}
+			\item $\groupsek{i} \gets E_{i-1}^{ns_i} \cdot (\tempsek{i})^{n-1} \cdot (\tempsek{i+1})^{n-2} \cdots \tempsek{i-2}$  \\
+			\item $\groupesk{i} \gets S_{i-1}^{n\esk_i} \cdot (\tempesk{i})^{n-1} \cdot (\tempesk{i+1})^{n-2} \cdots \tempesk{i-2}$  \\
+			\item $\groupeek{i} \gets E_{i-1}^{n\esk_i} \cdot (\tempeek{i})^{n-1} \cdot (\tempeek{i+1})^{n-2} \cdots \tempeek{i-2}$  \\
+			\item $\context = ((\spk_j)_{\User[j] \in \PartySet},(\epk_j)_{\User[j] \in \PartySet})$
+			\item $K \gets \FSHash (\context \concat \groupsek{i} \cdot \groupesk{i} \concat \groupeek{i})$\\
+		\end{nicodemus}
+	\end{subfigure}
+	\end{adjustbox}
+	\caption{The local session run by party $\User[i]$, with static key-pair $(\ssk_i, \spk_i)$. Recall that $\GakeIniMesSet[i]$ is the set of messages collected by $\User[i]$ at the end of the Initialization phase, while $\GakeResMesSet[i]$ is the set of those collected at the end of the Response phase.}
+	\label{fig:ourprotocol}
 \end{figure}
 
 In the Setup phase, each party $\User[i]$ generates a static key pair $(\ssk_i,\spk_i)$, and registers its public key $\spk_i$ using a PKI.
 In the Initialization phase, each party $\User[i]$ retrieves from the PKI the static keys $(\spk_1,\dots,\spk_n)$ of all the participants $\User[1],\dots,\User[n]$  in the key-exchange; then, it generates an ephemeral key pair $(\esk_i,\epk_i)$, and broadcasts the public key $\epk_i$. 
-In the Response phase, the party mixes static and ephemeral key material as follows:
+In the Response phase, each party mixes static and ephemeral key material:
 \begin{itemize}
-	\item it computes the static-on-ephemeral element $\hat{K}_i^\text{(se)} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\ssk_i}$
-	\item it computes the ephemeral-on-static element $\hat{K}_n^\text{(es)} \gets \left( \dfrac{\spk_{i+1}}{\spk_{i-1}}\right)^{\esk_i}$
-	\item it computes the ephemeral-on-ephemeral element $\hat{K}_n^\text{ee} \gets \left( \dfrac{\epk_{i+1}}{\epk_{i-1}}\right)^{\esk_i}$ 
+	\item with the subscript ``es'' we indicate the use of a static secret key on an ephemeral element
+	\item with the subscript ``se'' we indicate the use of an ephemeral secret key on a static element
+	\item with the subscript ``ee'' we indicate the use of an ephemeral secret key on an ephemeral element
 \end{itemize}
-and it broadcasts the results.
-In the Key-derivation phase, it computes the three partial keys $K_i^{(se)}$, $K_i^{(es)}$, $K_i^{(ee)}$ as in \Cref{fig:ourprotocol}, and it multiplies them together to obtain the key $K \gets K_i^{(se)} \cdot K_i^{(es)} \cdot K_i^{(ee)}$.
+The $\hat{ }$ symbol characterizes intermediate key elements produced in the Response phase.
+In the Key-derivation phase, each party computes the three partial keys $\groupsek{i}$, $\groupesk{i}$, $\groupeek{i}$ as in \Cref{fig:ourprotocol}, and multiplies the first two together to obtain the static-ephemeral key (the need for this step is explained in the proof of correctness).
+Finally, the session key is computed as $K \gets \FSHash (\context \concat \groupsek{i} \cdot \groupesk{i} \concat \groupeek{i})$.
 
-\textbf{Correctness}. We show that each party $\User[i]$ successfully computes the key $K = g^{e_1s_2 + \dots e_ns_1}\cdot g^{s_1e_2 + \dots s_ne_1}\cdot g^{e_1e_2 + \dots e_ne_1}$.
-We start off by explicitly expanding the partial key $K_i^{(ee)}$:
+\medskip
+\textbf{Correctness}. We show that each party $\User[i]$ successfully computes the group elements $g^{e_1s_2 + \dots e_ns_1}\cdot g^{s_1e_2 + \dots s_ne_1} = \groupsek{i} \cdot \groupesk{i}$ and $g^{e_1e_2 + \dots e_ne_1} = \groupeek{i}$.
+We start off by explicitly expanding the partial key $\groupeek{i}$:
 \begin{align*}
-	K_i^{(ee)} &\gets E_{i-1}^{n\esk_i} \cdot (\hat{K}_i^\text{(ee)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(ee)})^{n-2} \cdots \hat{K}_{i-2}^\text{(ee)}\\
+	\groupeek{i} &\gets E_{i-1}^{n\esk_i} \cdot (\tempeek{i})^{n-1} \cdot (\tempeek{i+1})^{n-2} \cdots \tempeek{i-2}\\
 	&= E_{i-1}^{n\esk_i} \cdot  \dfrac{\epk_{i+1}^{(n-1)\esk_i}}{\epk_{i-1}^{(n-1)\esk_i}} \cdot \dfrac{\epk_{i+2}^{(n-2)\esk_{i+1}}}{\epk_{i}^{(n-2)\esk_{i+1}}} \cdots  \dfrac{\epk_{i-1}^{\esk_{i-2}}}{\epk_{i-3}^{\esk_{i-2}}}  \\
 	&= E_{i-1}^{\esk_i} \cdot  \epk_{i+1}^{\esk_i} \cdot \epk_{i+2}^{\esk_{i+1}} \cdots  \epk_{i-1}^{\esk_{i-2}}  \\
 	&= g^{\esk_{i-1}\esk_i} \cdot  g^{\esk_i\esk_{i+1}} \cdot g^{\esk_{i+1}\esk_{i+2}} \cdots  g^{\esk_{i-2}\esk_{i-1}}  \\
 \end{align*}
-As shown below, when dealing with the other partial keys  $K_i^{(se)}$ and $K_i^{(es)}$  individually, we cannot perform such neat simplifications but for the first term:
+As shown below, when dealing with the other partial keys  $\groupsek{i}$ and $\groupesk{i}$  individually, we cannot perform such neat simplifications but for the first term:
+
 \begin{align*}
-	K_i^{(se)} &= \epk_{i-1}^{n\ssk_i} \cdot (\hat{K}_i^\text{(se)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(se)})^{n-2} \cdots \hat{K}_{i-2}^\text{(se)} \\
+	\groupsek{i} &= \epk_{i-1}^{n\ssk_i} \cdot (\tempsek{i})^{n-1} \cdot (\tempsek{i+1})^{n-2} \cdots \tempsek{i-2} \\
 	&= \epk_{i-1}^{n\ssk_i} \cdot  \dfrac{\epk_{i+1}^{(n-1)\ssk_i}}{\epk_{i-1}^{(n-1)\ssk_i}} \cdot \dfrac{\epk_{i+2}^{(n-2)\ssk_{i+1}}}{\epk_{i}^{(n-2)\ssk_{i+1}}} \cdots  \dfrac{\epk_{i-1}^{\ssk_{i-2}}}{\epk_{i-3}^{\ssk_{i-2}}}  \\
 	&= g^{\esk_{i-1}\ssk_i} \cdot \epk_{i+1}^{(n-1)\ssk_i} \cdot \dfrac{\epk_{i+2}^{(n-2)\ssk_{i+1}}}{\epk_{i}^{(n-2)\ssk_{i+1}}} \cdots  \dfrac{\epk_{i-1}^{\ssk_{i-2}}}{\epk_{i-3}^{\ssk_{i-2}}}  \\
-	K_i^{(es)} &= \spk_{i-1}^{n\esk_i} \cdot (\hat{K}_i^\text{(es)})^{n-1} \cdot (\hat{K}_{i+1}^\text{(es)})^{n-2} \cdots \hat{K}_{i-2}^\text{(es)}  \\
+	\groupesk{i} &= \spk_{i-1}^{n\esk_i} \cdot (\tempesk{i})^{n-1} \cdot (\tempesk{i+1})^{n-2} \cdots \tempesk{i-2}  \\
 	&= \spk_{i-1}^{n\esk_i} \cdot  \dfrac{\spk_{i+1}^{(n-1)\esk_i}}{\spk_{i-1}^{(n-1)\esk_i}} \cdot \dfrac{\spk_{i+2}^{(n-2)\esk_{i+1}}}{\spk_{i}^{(n-2)\esk_{i+1}}} \cdots  \dfrac{\spk_{i-1}^{\esk_{i-2}}}{\spk_{i-3}^{\esk_{i-2}}}  \\
 	&= g^{\ssk_{i-1}\esk_i} \cdot \spk_{i+1}^{(n-1)\esk_i} \cdot \dfrac{\spk_{i+2}^{(n-2)\esk_{i+1}}}{\spk_{i}^{(n-2)\esk_{i+1}}} \cdots  \dfrac{\spk_{i-1}^{\esk_{i-2}}}{\spk_{i-3}^{\esk_{i-2}}}  \\
 \end{align*}
-It is easy to see that the missing simplifications are enabled once we multiply the partial keys together: note how the factor $\epk_{i+1}^{(n-1)\ssk_i}$ in $K_i^{(se)}$ absorbs the denominator ${\spk_{i}^{(n-2)\esk_{i+1}}}$ in $K_i^{(es)}$, resulting in $g^{\ssk_i \esk_{i+1}}$.
-We can perform analogous computations to the other enumerators, both in $K_i^{(se)}$ (giving rise to all terms $g^{\ssk_{j-1}\esk_j}$ but for $j=i$, which is already in $K_i^{(es)}$) and in $K_i^{(es)}$ (giving rise to all terms $g^{\esk_{j-1}\ssk_j}$ but for $j=i$, which is already in $K_i^{(se)}$), and this concludes the proof.
+It is easy to see that the missing simplifications are re-introduced once we multiply the partial keys together: note how the factor $\epk_{i+1}^{(n-1)\ssk_i}$ in $\groupsek{i}$ absorbs the denominator ${\spk_{i}^{(n-2)\esk_{i+1}}}$ in $\groupesk{i}$, resulting in $g^{\ssk_i \esk_{i+1}}$.
+We can perform analogous computations to the other enumerators, both in $\groupsek{i}$ (giving rise to all terms $g^{\ssk_{j-1}\esk_j}$ but for $j=i$, which is already in $\groupesk{i}$) and in $\groupesk{i}$ (giving rise to all terms $g^{\esk_{j-1}\ssk_j}$ but for $j=i$, which is already in $\groupsek{i}$), and the commutativity of group multiplication concludes the proof.\medskip
+
+\textbf{Security proof.}
+Work in progress!!!
+
+\underline{\textit{Game 0.}}
+In this game we abort if two global sessions result in the same session key. This happens when the set of static and ephemeral public keys are the same, which results in  messages output at the end of the Initialization phase and at the end of the Response phase are equal

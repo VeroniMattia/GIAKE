@@ -49,6 +49,9 @@
 \newcommand{\matchingSessions}{\mathfrak{M}(\sID^*)}
 \newcommand{\suchthat}{\text{ s.\,t. }}
 \newcommand{\pcor}{\textbf{or }}
+\newcommand{\tabfalse}{$\mathbf{F}$}
+\newcommand{\pcfetch}{\textbf{fetch} }
+\newcommand{\pcbroadcast}{\textbf{broadcast} }
 
 %keys
 \newcommand{\skS}{\sk}
@@ -57,19 +60,27 @@
 \newcommand{\spk}{S}
 \newcommand{\esk}{e}
 \newcommand{\epk}{E}
+\newcommand{\FSHash}{\mathsf{H}}
+\newcommand{\context}{\text{ctxt}}
 
 %GAKE
 \newcommand{\ini}{i}
 \newcommand{\GIAKE}{\algfont{GIAKE}}
 \newcommand{\KeyGen}{\algfont{KeyGen}}
 \newcommand{\GAKEIni}{\algfont{Init}}
-\newcommand{\GAKERes}{\algfont{Res}}
+\newcommand{\GAKERes}{\algfont{Resp}}
 \newcommand{\GAKEDer}{\algfont{Der}}
 \newcommand{\messageIni}{m_{\ini}}
 \newcommand{\messageIniRes}{m_{j}}
 \newcommand{\GiakeFS}{\mathsf{IND\hyphen G\hyphen FS}}
 \newcommand{\GIAKEsecurityPFSGame}{\GiakeFS}
 \newcommand{\hyphen}{\mbox{-}}
+\newcommand{\tempesk}[1]{\hat{K}_{#1,\text{es}}}
+\newcommand{\tempsek}[1]{\hat{K}_{#1,\text{se}}}
+\newcommand{\tempeek}[1]{\hat{K}_{#1,\text{ee}}}
+\newcommand{\groupsek}[1]{K_{#1,se}}
+\newcommand{\groupesk}[1]{K_{#1,es}}
+\newcommand{\groupeek}[1]{K_{#1,ee}}
 
 %HPS
 \newcommand{\HPS}{\algfont{HPS}}
@@ -95,7 +106,7 @@
 \newcommand{\bool}[1]{\llbracket #1\rrbracket}
 \newcommand{\orfont}[1]{\mathsc{#1}}      % Oracle font
 \newcommand{\GakeIni}{\algfont{Init}}
-\newcommand{\GakeIniO}{\orfont{Session}_\mathsf{I}}
+\newcommand{\GakeIniO}{\orfont{Session}_\mathsf{Init}}
 \newcommand{\GIni}{\User[i]}
 \newcommand{\GakeUId}{i}
 \newcommand{\cntS}{\text{cnt}_{\text{S}}}
@@ -129,7 +140,7 @@
 \newcommand{\KeyvfyO}{\mathsc{KVer}}
 \newcommand{\emptystr}{\epsilon}
 
-\newcommand{\GakeRes}{\algfont{Res}}
+\newcommand{\GakeRes}{\algfont{Resp}}
 \newcommand{\GakeIniResMes}{{\messageIniRes}}
 \newcommand{\GakeIniMesSet}[1][]{\mathcal{M}_{#1}}
 \newcommand{\GIniMesSet}{\mathcal{M}}
@@ -145,7 +156,7 @@
 \newcommand{\varfont}[1]{\mathit{#1}}
 \newcommand{\GakeSessKey}[1][]{\varfont{K}_{#1}}
 \newcommand{\GakeFS}{\mathsf{IND\hyphen G\hyphen FS}}
-\newcommand{\GakeResO}{\orfont{Session}_\mathsf{R}}
+\newcommand{\GakeResO}{\orfont{Session}_\mathsf{Resp}}
 \newcommand{\GakeDer}{\algfont{Der}}
 \newcommand{\GakeDerO}{\orfont{Der}}
 \newcommand{\GakeGScnt}{k}
@@ -155,8 +166,8 @@
 %\newcommand{\parties}{\text{users}}
 \newcommand{\peers}{\mathcal{P}}
 \newcommand{\numpeers}{n}
-\newcommand{\GIniMes}{\changehighlight{\mathsf{Msg_I}}}
-\newcommand{\GResMes}{\changehighlight{\mathsf{Msg_R}}}
+\newcommand{\GIniMes}{\changehighlight{\mathsf{Msg_Init}}}
+\newcommand{\GResMes}{\changehighlight{\mathsf{Msg_Resp}}}
 \newcommand{\states}{\text{state}}
 \newcommand{\Gstates}{\states}
 \newcommand{\revealed}{\text{revealed}}
