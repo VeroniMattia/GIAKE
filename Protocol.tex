@@ -74,7 +74,13 @@ It is easy to see that the missing simplifications are re-introduced once we mul
 We can perform analogous computations to the other enumerators, both in $\groupsek{i}$ (giving rise to all terms $g^{\ssk_{j-1}\esk_j}$ but for $j=i$, which is already in $\groupesk{i}$) and in $\groupesk{i}$ (giving rise to all terms $g^{\esk_{j-1}\ssk_j}$ but for $j=i$, which is already in $\groupsek{i}$), and the commutativity of group multiplication concludes the proof.\medskip
 
 \textbf{Security proof.}
-Work in progress!!!
+{\color{red}Work in progress!!!}
 
-\underline{\textit{Game 0.}}
-In this game we abort if two global sessions result in the same session key. This happens when the set of static and ephemeral public keys are the same, which results in  messages output at the end of the Initialization phase and at the end of the Response phase are equal
+\Game{$G_0$}
+In this game we abort if the uniqueness of the session is broken, i.e. if two global sessions result in the same session key. 
+We assume that each static public key is belongs a single user and acts like an identifier (a reasonable assumption, considering the exponential size of the key space and the polynomial size of the party set). 
+For two session keys to be equal, the remaining elements of the context $\context$ must be the same.
+This happens if and only if each party in $\PartySet$ samples the same ephemeral keys in two distinct sessions.
+In the worst case scenario, where all $\maxusers$ parties are involved ($\PartySet = \Universe$), this happens with probability $\maxsessions^2/|\GG|$, where $\maxsessions$ is the maximum number of global sessions and $|\GG|$ is the size of the group.
+Thus
+\[ \prob{1 \gets G_0^\adv} \leq \dfrac{\maxsessions}{|\GG|}.\]

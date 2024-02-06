@@ -13,13 +13,13 @@ A \textit{local session} is what a participant computes, influenced by the recei
 Each local instance is identified globally with a \textit{session identifier}, typically a counter.
 We call a participant in a GKE session a \textit{party}.
 
-\paragraph{The generic protocol.} We consider a universe $\Universe$ of size $\mu$, containing all users in the system.
+\paragraph{The generic protocol.} We consider a universe $\Universe$ of size $\maxusers$, containing all users in the system.
 Each user holds a static (long-term) key pair $(\ssk_i,\spk_i)$, and is registered in the system by its public key $\spk$; we treat the universe as a Public-Key Infrastructure (PKI) that allows for public-key look-up.
 In particular, we let PKI register the party identities according to some ordering (e.g. time of registration to the PKI), implicitly determining how to sort the participants to a key-exchange session in a sequence.
 
 \begin{plaindef}[GIAKE]\label{def:GKE}
 	Let $\projectKey \in \NN$ be the maximum number of parties, and let $\secparam\in \NN$ be the security parameter. 
-	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is run by $3\leq n \leq \mu$ parties in $\PartySet = (\Party_1,\allowbreak \Party_2,\dots,\Party_n)$, arranged in a cycle (operations on the indices are taken modulo $n$).
+	A \textit{Group Implicitly Authenticated Key Exchange} (GIAKE) protocol is run by $3\leq n \leq \maxusers$ parties in $\PartySet = (\Party_1,\allowbreak \Party_2,\dots,\Party_n)$, arranged in a cycle (operations on the indices are taken modulo $n$).
 	The protocol consists of four algorithms $\GIAKE = (\KeyGen, \GAKEIni, \GAKERes, \GAKEDer)$ defined as follows:
 	\begin{itemize}
 		\item $(\sk,\pk) \getsr \KeyGen(1^\secpar)$: a PPT key-generation algorithm that outputs a uniformly random secret key $\sk$ and the corresponding public key $\pk$.
@@ -93,10 +93,10 @@ Depicted in \Cref{fig:game-ind-atk-gake}, {\textbf{GAME} $\GIAKEsecurityPFSGame$
 			\begin{minipage}[t]{\textwidth}
 				\underline{\textbf{GAME} $\GIAKEsecurityPFSGame$} 
 				\begin{nicodemus}[1]
-					\item $\pcfor i \in [\mu]$
+					\item $\pcfor i \in [\maxusers]$
 					\item \quad $(\spk_i, \ssk_i) \leftarrow \KeyGen(\secparam)$
 					\item $b\getsr \{0,1\}$
-					\item $b' \gets	\adv^{O}(\spk_1, \cdots, \spk_\mu)$
+					\item $b' \gets	\adv^{O}(\spk_1, \cdots, \spk_\maxusers)$
 					\item \pcfor $\sID^*\in\testSessions$:
 					\item \quad \pcif $\FreshnessO(\sID^*)=\pcfalse$
 					\item \quad \quad $\pcreturn 0$\gcom{session not fresh}\label{line:gakefreshness}
@@ -149,11 +149,11 @@ We also consider two helper procedures, $\FreshnessO$ and $\ValidAttackO$, for g
 \paragraph{The adversarial model.}
 The goal of the adversary is to guess the bit $b$ sampled by the challenger, based on the following additional oracle calls:
 \begin{itemize}
-	\item with $\GakeIniO ( \GIni  \in [\mu], \PartySet_{i} \subseteq [\mu])$, the adversary triggers party $\User[i]$ to run the Initialization phase of a group key exchange with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the Initialization algorithm. We let $\owner[\sID] \in [\mu]$ denote the owner of the session, $\peer[\sID] \subseteq[\mu]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
+	\item with $\GakeIniO ( \GIni  \in [\maxusers], \PartySet_{i} \subseteq [\maxusers])$, the adversary triggers party $\User[i]$ to run the Initialization phase of a group key exchange with intended parties in the sorted set $\PartySet_{i}$ (thus $\PartySet = \PartySet_{i}  \cup \{\User[i]\}$). This oracle call provides the adversary with a session identifier $\sID$ and the message $\GakeIniMes_{i}$ that results from $\User[i]$ running the Initialization algorithm. We let $\owner[\sID] \in [\maxusers]$ denote the owner of the session, $\peer[\sID] \subseteq[\maxusers]$ denote the peers of the session, $\GakeUSet[\sID]$ denote all the parties of the session, $\GIniMes[\sID]$ denote the message sent by the owner during the first round, and $\GIniMesSet[\sID]$ denote the messages received by the owner during the first round
 	\item with $\GakeResO(\sID \in [\cntS], \GakeIniMesSet[{i}] )$, the adversary triggers $\owner[\sID]$ to run the Response phase for the session with identifier $\sID$, using $\GakeIniMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted in the Initialization phase. This oracle provides $\adv$ with the message $\GakeResMes_{i}$ sent by $\owner[\sID]$ as result of the response algorithm. We let $\GResMes[\sID]$ denote the message sent by the owner during the second round, and $\peercorrupted[\sID]$ denote whether one of the peers in the session was corrupted (its static key has been revealed to $\adv$ prior to the session key derivation)
 	\item with $\GakeDerO(\GakeResUsID \in [\cntS],  \GakeResMesSet[{i}])$, the adversary triggers $\owner[\sID]$ to proceed with the key derivation in session $\sID$, using $\GakeResMesSet[i]$ as the set of messages that the peers of $\owner[\sID]$ have broadcasted after its response message $\GakeResMes_{i}$. We let $\Gstates[\sID]$ denote the (secret) state information, i.e. ephemeral secret keys, $\ListGakeSessKey[\sID]$ denote the session key, and $\emptystr$ denote an empty string
 	\item with $\RevealO(\sID)$, the adversary gets from the challenger the session key computed at the end of session $\sID$. We let $\revealed[\sID]$ denote whether the group session key for the session $\sID$ was revealed or not
-	\item with $\CorruptO(n \in [\mu])$, the adversary corrupts user $n$, obtaining its static secret key $\ssk_n$. We let $\corrupted[{i}]$ denote whether the static secret key of  $\User[{i}]$ was leaked or not
+	\item with $\CorruptO(n \in [\maxusers])$, the adversary corrupts user $n$, obtaining its static secret key $\ssk_n$. We let $\corrupted[{i}]$ denote whether the static secret key of  $\User[{i}]$ was leaked or not
 	\item with $\TestO(\sID)$, the adversary requires to be tested on session $\sID$. If any session was computed, the challenger responds either with the real session key or with a random key, depending on the bit $b$ sampled at the beginning of the game.
 \end{itemize}
 
@@ -209,7 +209,7 @@ The goal of the adversary is to guess the bit $b$ sampled by the challenger, bas
 	\item $\pcreturn \skeys[\sID]$	\\	
 \end{nicodemus}
 
-\underline{$\CorruptO(n \in [\mu])$}
+\underline{$\CorruptO(n \in [\maxusers])$}
 \begin{nicodemus}
 	\item $\corrupted[n] := \pctrue$
 	\item $\pcreturn \ssk_n$\\
@@ -293,7 +293,7 @@ Note that the index $j$ for the position of party $\User[j]$ in the ordered set 
 %	\begin{itemize}
 %		\item $\HPSparams: = (\HPSgroup,\Codomain,\Domain,\Language,\SKSpace,\PKSpace,\HPSHash,\projectKey)  \getsr \HPSParam (1^\secpar)$: a PPT parameter setup algorithm that outputs a parameter set $\HPSparams$ containing a possibly empty set $\HPSgroup$ of extra parameters, a codomain $\Codomain$, a domain $\Domain$, a language $\Language$, a hashing key space $\SKSpace$, a projective key space $\PKSpace$, a smooth projective hash function $\HPSHash_{(\cdot)}: \Domain \rightarrow \Codomain$ and a projection function $\projectKey: \SKSpace \rightarrow \PKSpace$;
 %		\item $\y \gets \HPSPrivEval (\sk,\x)$: a deterministic private hashing algorithm that, on input a secret hashing key $\sk$ and an element $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$;
-%		\item $\y \gets \HPSPubEval (\pk,\x,w)$: a deterministic public hashing algorithm that, on input a projection key $\pk = \mu(\sk)$, an element $\x \in \Language$ and a witness $w$ for the fact that $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$.
+%		\item $\y \gets \HPSPubEval (\pk,\x,w)$: a deterministic public hashing algorithm that, on input a projection key $\pk = \maxusers(\sk)$, an element $\x \in \Language$ and a witness $w$ for the fact that $\x \in \Language$, outputs the digest $\y = \HPSHash_\sk(\x)$.
 %	\end{itemize}
 %\end{definition}
 %
