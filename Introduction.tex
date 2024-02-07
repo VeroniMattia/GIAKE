@@ -2,6 +2,7 @@
 \newcommand{\introAKE}{\text{AKE}\xspace}
 \newcommand{\introNumSess}{s}
 \newcommand{\introNumUser}{n}
+\newcommand{\reduction}{\mathcal{R}}
 
 
 \section{Introduction}\label{sec:introduction}
@@ -11,22 +12,38 @@ In the end, we require that the shared session key from a \introGAKE should be p
 
 \paragraph{Existing Constructions.}
 Constructing secure \introGAKE protocols has a long history, and almost all the existing protocols \cite{CCS:BCPQ01,AC:BreChePoi01,EC:BreChePoi02,PQCRYPTO:ADGK19,JC:PanQiaRin22} are constructed via a signature-based approach. Namely, it uses a digital signature scheme to authenticate a passively secure group key protocol. Such a signature-based approach is rather inefficient. We take the protocol in \cite{JC:PanQiaRin22} as an example: To agree on a session key with a group of $n$ users, each user needs to run the signing algorithm 2 times and the verification algorithm $3(n-1)$ times. With Schnorr's signature scheme, this already requires $2+6(n-1)$ times group exponentiation. Taking the security loss of Schnorr's signature into account, this can be very inefficient in practice. Hence, we are interested in constructing a secure \introGAKE without signatures in this paper.
+We stress that this is not only relevant for efficiency, but also interesting in theory to consider  whether it is possible to construct a secure \introGAKE protocol without signatures.
 
-To the best of our knowledge, the work of Li and Yang \cite{CANS:LiYan13} is the only signature-less \introGAKE protocol. However, it requires the use of (cryptographic) multilinear maps \cite{EC:GarGenHal13}, which is a rather strong requirement. Until now, we do not know any efficient multilinear maps. This leads to the first goal of our work, namely, to construct a \textit{signature-less} \introGAKE protocol from \textit{a weak, standard assumption.}
+To the best of our knowledge, the work of Li and Yang \cite{CANS:LiYan13} is the only signature-less \introGAKE protocol. However, it requires the use of (cryptographic) multilinear maps \cite{EC:GarGenHal13}, which is a rather strong requirement. Until now, we do not know any efficient multilinear maps. 
+This leads to the first goal of our work, namely:
+%This leads to the first goal of our work, namely, to construct a \textit{signature-less} \introGAKE protocol from \textit{a weak, standard assumption.}
 
-%\begin{displayquote}
-%	\emph{Our First Goal:} Constructing a secure \introGAKE protocol from a weak, standard assumption.
-%\end{displayquote} 
+\begin{displayquote}
+	\emph{Our First Goal:} Constructing a secure \introGAKE protocol from a weak, standard assumption.
+\end{displayquote} 
 
 % They all have single-Test query
 
 \paragraph{Tight Security.}
-Moreover, most of the aforementioned protocols have large security loss. For instance, the protocol of Bresson, Chevassute, and Pointcheval \cite{AC:BreChePoi01} has security loss $O(\introNumUser \cdot \introNumSess)$, where $\introNumUser$ and $\introNumSess$ are the numbers of users and sessions per user, respectively. Even worse, protocols in \cite{CCS:BCPQ01,CANS:LiYan13} lose at least an exponential factor $\introNumSess^{\introNumUser}$. This makes it particularly inefficient to instantiate these protocols in a theoretically sound manner.
+We observe that most of the aforementioned protocols have large security loss. For instance, the protocol of Bresson, Chevassute, and Pointcheval \cite{EC:BreChePoi02} has security loss $O(\introNumUser \cdot \introNumSess)$, where $\introNumUser$ and $\introNumSess$ are the numbers of users and sessions per user, respectively. Even worse, protocols in \cite{CCS:BCPQ01,CANS:LiYan13} lose at least an exponential factor of $\introNumSess^{\introNumUser}$.
+This makes it particularly inefficient to instantiate these protocols in a theoretically sound manner.
 %Say all existing protocols have large security loss
 
-\jiaxin{Explain tight security, etc...}
+Security loss is a concrete factor to quantify security. More precisely, when we prove the security of a protocol $\Pi$, we construct a reduction $\reduction$ to show that if an adversary can break the security of $\Pi$ with probability $\varepsilon_{\Pi}$, then $\reduction$ can break the underlying computational problem $P$ with probability $\varepsilon_{P} \geq \nicefrac{\varepsilon_{\advA}}{\ell}$, and we assume the runtime of $\reduction$ is roughly the same as $\advA$.. 
+Here the factor $\ell$ is the security loss, 
+When $\ell$ is a small constant, we call the security reduction tight. 
 
-\paragraph{``Sweet-spot'' between Efficiency and Tightness.}
+Among the known \introGAKE protocols, the work of Pan, Qian, and Ringerud (PQR) \cite{JC:PanQiaRin22} is the only tight construction that we know, but it requires a tightly secure signature scheme with adaptive corruptions. The most efficient construction of such a signature is due to Diemert, Gellert, Jager, and Lyu (DGJL) \cite{PKC:DGJL21}, which 
+%contains 3 $\ZZ_p$-elements in the signature and 
+requires 6 exponentiation for signing a message and 8 exponentiation for verifying a signature. Asymptotically, this is rather inefficient, considering that Schnorr's signature only need 1 exponentiation for signing and 2 exponentiation for verification.
+%Hence, it is interesting to consider whether there is a more efficient  
+%\jiaxin{Explain tight security, etc...}
+
+\paragraph{A Balanced View on Tight Security.}
+It is usually desirable to have tight security proofs. 
+This is because, when instantiating a non-tight protocol $\Pi$ according to the security proof, one needs to increase the security parameter to compensate the security loss $\ell$.
+\jiaxin{I am here.}
+
 We are interested in tightness, but more into searching the sweet-spot between tightness and efficiency.
 
 
@@ -35,7 +52,7 @@ How magnificent have we been?
 
 Our efficiency $\approx$ $3\times $ BD, but much less than the Sign-GAKE (2*Sign + 3(n-1)*Ver) per user.
 
-\paragraph{Technical Overview: A Simple Twist on BD.}
+\paragraph{Technical Overview: A Simple Twist on the Burmester-Desmedt Protocol.}
 
 \paragraph{Open Problems.}
 We leave constructing an efficient signature-less post-quantum \introGAKE protocol as an interesting open problem. 
