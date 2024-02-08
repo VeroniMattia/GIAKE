@@ -3,6 +3,7 @@
 \newcommand{\introNumSess}{s}
 \newcommand{\introNumUser}{n}
 \newcommand{\reduction}{\mathcal{R}}
+\newcommand{\CCGJJ}{CCGJJ\xspace}
 
 
 \section{Introduction}\label{sec:introduction}
@@ -19,7 +20,7 @@ This leads to the first goal of our work, namely:
 %This leads to the first goal of our work, namely, to construct a \textit{signature-less} \introGAKE protocol from \textit{a weak, standard assumption.}
 
 \begin{displayquote}
-	\emph{Our First Goal:} Constructing a secure \introGAKE protocol from a weak, standard assumption.
+	\emph{Our First Goal:} Constructing a secure \introGAKE protocol from \textit{weak, standard assumptions}.
 \end{displayquote} 
 
 % They all have single-Test query
@@ -35,16 +36,24 @@ When $\ell$ is a small constant, we call the security reduction tight.
 
 Among the known \introGAKE protocols, the work of Pan, Qian, and Ringerud (PQR) \cite{JC:PanQiaRin22} is the only tight construction that we know, but it requires a tightly secure signature scheme with adaptive corruptions. The most efficient construction of such a signature is due to Diemert, Gellert, Jager, and Lyu (DGJL) \cite{PKC:DGJL21}, which 
 %contains 3 $\ZZ_p$-elements in the signature and 
-requires 6 exponentiation for signing a message and 8 exponentiation for verifying a signature. Asymptotically, this is rather inefficient, considering that Schnorr's signature only need 1 exponentiation for signing and 2 exponentiation for verification.
+requires 6 exponentiation for signing a message and 8 exponentiation for verifying a signature. Asymptotically, this is rather inefficient, considering that Schnorr's signature only needs 1 exponentiation for signing and 2 exponentiation for verification.
+We aim to further lower the cost for tightness.
 %Hence, it is interesting to consider whether there is a more efficient  
 %\jiaxin{Explain tight security, etc...}
 
 \paragraph{A Balanced View on Tight Security.}
 It is usually desirable to have tight security proofs. 
 This is because, when instantiating a non-tight protocol $\Pi$ according to the security proof, one needs to increase the security parameter to compensate the security loss $\ell$.
-\jiaxin{I am here.}
+However, when it costs much more exponentiation to achieve tight security, it will lower its practical relevance, since it can lead to much worse concrete efficiency than a non-tight protocol. Hence, our goal is to achieve better concrete efficiency with a balance view on tightness, and we search a ``sweet-spot'' between asymptotic efficiency and tight security.
 
-We are interested in tightness, but more into searching the sweet-spot between tightness and efficiency.
+%We are interested in tightness, but more into searching the sweet-spot between tightness and efficiency.
+
+This is inspired by the work of Cohn-Gordon et al. (\CCGJJ) \cite{C:CCGJJ19}, where the security loss of their \introAKE protocol is independent of the number of sessions, but linearly dependent of the number of users. We call such a protocol \textit{session-tight} for simplicity. Although the \CCGJJ protocol is not fully tight (but session-tight), it achieves better efficiency than its fully tight counter-part. According to \cite[Fig. 2]{EC:JKRS21}, the communication complexity of \CCGJJ is less than half of the fully tight protocol, $\mathsf{AKE_{wFS,DDH}}$. In terms of computation complexity, the \CCGJJ protocol only requires 4 exponentiation per users to agree on a session key, compared to at least 6 per users in $\mathsf{AKE_{wFS,DDH}}$.
+Hence, our second goal is
+
+\begin{displayquote}
+	\emph{Our Second Goal:} Constructing an \textit{efficient} \introGAKE protocol via \textit{session-tight} reductions.
+\end{displayquote} 
 
 
 \subsection{Our Contribution}
