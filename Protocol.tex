@@ -1,5 +1,5 @@
 \section{Protocol}\label{sec:protocol}
-In this section we present our first protocol \mattia{name of the protocol}, focusing on the session of party $\User[i]$.
+In this section we present our first protocol \mattia{name of the protocol}, focusing on a session run from the viewpoint of party $\User[i]$.
 We then show its correctness, expanding the computation that $\User[i]$ performs in the key-derivation phase.
 We prove the protocol secure \mattia{security notion and model} in \Cref{sec:security}.
 
@@ -42,12 +42,17 @@ We prove the protocol secure \mattia{security notion and model} in \Cref{sec:sec
 In the Setup phase, each party $\User[i]$ generates a static key pair $(\ssk_i,\spk_i)$, and registers its public key $\spk_i$ using a PKI.
 In the Initialization phase, each party $\User[i]$ retrieves from the PKI the static keys $(\spk_1,\dots,\spk_n)$ of all the participants $\User[1],\dots,\User[n]$  in the key-exchange; then, it generates an ephemeral key pair $(\esk_i,\epk_i)$, and broadcasts the public key $\epk_i$. 
 In the Response phase, each party mixes static and ephemeral key material:
+%\begin{itemize}
+%	\item with the subscript ``es'' we indicate the use of a static secret key on an ephemeral element
+%	\item with the subscript ``se'' we indicate the use of an ephemeral secret key on a static element
+%	\item with the subscript ``ee'' we indicate the use of an ephemeral secret key on an ephemeral element
+%\end{itemize}
 \begin{itemize}
-	\item with the subscript ``es'' we indicate the use of a static secret key on an ephemeral element
-	\item with the subscript ``se'' we indicate the use of an ephemeral secret key on a static element
-	\item with the subscript ``ee'' we indicate the use of an ephemeral secret key on an ephemeral element
+	\item with $\tempsek{}$ we indicate the use of a static secret key on an ephemeral element
+	\item with $\tempesk{}$ we indicate the use of an ephemeral secret key on a static element
+	\item with $\tempeek{}$ we indicate the use of an ephemeral secret key on an ephemeral element
 \end{itemize}
-The $\hat{ }$ symbol characterizes intermediate key elements produced in the Response phase.
+%The $\hat{ }$ symbol characterizes the intermediate key elements produced in the Response phase.
 In the Key-derivation phase, each party computes the three partial keys $\groupsek{i}$, $\groupesk{i}$, $\groupeek{i}$ as in \Cref{fig:ourprotocol}, and multiplies the first two together to obtain the static-ephemeral key (the need for this step is explained in the proof of correctness).
 Finally, the session key is computed as $K \gets \FSHash (\context \concat \groupsek{i} \cdot \groupesk{i} \concat \groupeek{i})$.
 
